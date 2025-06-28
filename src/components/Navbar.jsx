@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import appLogo from '../assets/images/wijaya_logo.png';
+import appLogo from '../assets/images/wijaya.png';
 
 const Navbar = () => {
   const { currentUser, logout } = useAuth();
@@ -29,7 +29,7 @@ const Navbar = () => {
   };
 
   const logoImageStyle = {
-    height: '55px', // Sesuaikan tinggi logo
+    height: '116px', // Sesuaikan tinggi logo
     width: 'auto',
     // Tidak perlu marginRight karena sudah ada gap di brandSectionStyle
   };

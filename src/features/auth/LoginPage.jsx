@@ -25,8 +25,7 @@ import { loginPageStyles } from '../../style/LoginPageStyles';
 
 // --- (PENTING) Impor logo di sini ---
 // PATH PENTING: Sesuaikan path ini agar benar relatif terhadap file LoginPage.jsx
-import logo from '../../assets/images/wijaya_logo.png'; 
-
+import logo from '../../assets/images/wijaya.png'; 
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -59,6 +58,11 @@ function LoginPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleITSupportClick = () => {
+    // Ganti email dengan alamat email IT Support yang sebenarnya
+    window.location.href = 'mailto:chandrabw.cjcc@gmail.com?subject=Lupa Password Dashboard Mandor&body=Mohon bantu reset password akun saya.';
   };
 
   return (
@@ -196,19 +200,20 @@ function LoginPage() {
 
             <Box sx={{ width: '100%', textAlign: 'center', mt: 2 }}>
               <Typography
+              variant="body2"
+              sx={loginPageStyles.linkTextSecondary} // Style dari objek terpisah
+            >
+              Lupa Password ?{' '}
+              <Typography
+                component="span"
                 variant="body2"
-                sx={loginPageStyles.linkTextSecondary} // Style dari objek terpisah
+                sx={loginPageStyles.linkPrimary} // Style dari objek terpisah
+                // Mengganti onClick={() => navigate('')} dengan fungsi handleITSupportClick
+                onClick={handleITSupportClick} // <-- Panggil fungsi ini
               >
-                Belum punya akun?{' '}
-                <Typography
-                  component="span"
-                  variant="body2"
-                  sx={loginPageStyles.linkPrimary} // Style dari objek terpisah
-                  onClick={() => navigate('/signup')}
-                >
-                  Daftar di sini
-                </Typography>
+                Admin IT Support
               </Typography>
+            </Typography>
             </Box>
           </Box>
         </Paper>

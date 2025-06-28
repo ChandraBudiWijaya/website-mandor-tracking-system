@@ -1,70 +1,53 @@
-# Getting Started with Create React App
+# Mandor Banana Tracking Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![Login Preview](docs/login_preview.png)
+_Opsional: Ganti `docs/login_preview.png` dengan path gambar screenshot halaman login terbaru Anda setelah di-deploy atau di-build._
 
-## Available Scripts
+Aplikasi web dashboard untuk Mandor Banana Tracking, dibangun dengan React, Material-UI, dan Firebase. Dashboard ini bertujuan untuk membantu mandor mengelola dan memantau operasional perkebunan pisang secara lebih efisien, termasuk pelacakan karyawan, ringkasan harian, dan fitur geofence.
 
-In the project directory, you can run:
+## Daftar Isi
 
-### `npm start`
+- [Mandor Banana Tracking Dashboard](#mandor-banana-tracking-dashboard)
+  - [Daftar Isi](#daftar-isi)
+  - [Fitur Utama](#fitur-utama)
+  - [Teknologi yang Digunakan](#teknologi-yang-digunakan)
+    - [Frontend:](#frontend)
+    - [Backend / Database:](#backend--database)
+  - [Persyaratan Sistem](#persyaratan-sistem)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Fitur Utama
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+-   **Autentikasi Pengguna**: Sistem login yang aman dengan Firebase Authentication (Email/Password).
+-   **Manajemen Karyawan**: Fitur CRUD (Create, Read, Update, Delete) untuk data karyawan.
+-   **Pelacakan Sejarah**: Melihat riwayat lokasi dan aktivitas karyawan pada tanggal tertentu.
+-   **Ringkasan Harian**: Melihat ringkasan data operasional harian.
+-   **Geofencing**: Memantau pergerakan karyawan dalam area kerja yang telah ditentukan.
+-   **UI Modern**: Antarmuka pengguna yang responsif dan menarik dengan Material-UI dan desain _frosted glass_.
 
-### `npm test`
+## Teknologi yang Digunakan
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Frontend:
+-   **React.js**
+-   **Material-UI v5** (untuk komponen UI dan styling)
+-   **Emotion** (sebagai engine styling CSS-in-JS untuk Material-UI)
+-   **React Router DOM** (untuk navigasi antar halaman)
+-   **Google Fonts** (Poppins)
 
-### `npm run build`
+### Backend / Database:
+-   **Firebase** (Authentication untuk login, Firestore Database untuk penyimpanan data).
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Persyaratan Sistem
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Sebelum Anda dapat menginstal dan menjalankan proyek ini, pastikan Anda memiliki perangkat lunak berikut terinstal di sistem Anda:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+-   **Node.js**: Versi 14.x atau lebih tinggi.
+    -   _Saran: Gunakan [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) untuk mengelola versi Node.js Anda dengan mudah._
+-   **npm (Node Package Manager)** atau **Yarn**:
+    -   **npm**: Versi 8.x atau lebih tinggi (biasanya sudah terinstal bersama Node.js).
+    -   **Yarn**: Versi 1.x atau lebih tinggi (jika Anda memilih menggunakan Yarn).
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Anda dapat memeriksa versi Node.js dan npm/Yarn Anda dengan menjalankan perintah berikut di terminal:
+```bash
+node -v
+npm -v
+yarn -v # Jika menggunakan Yarn

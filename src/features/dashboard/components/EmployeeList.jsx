@@ -1,41 +1,40 @@
-import React, { useState, useMemo } from 'react'; // Tambahkan useState dan useMemo
-import { List, ListItem, ListItemButton, ListItemText, Typography, Box, TextField } from '@mui/material'; // Tambahkan TextField
+import React, { useState, useMemo } from 'react';
+import { List, ListItem, ListItemButton, ListItemText, Typography, Box, TextField } from '@mui/material';
 
 const EmployeeList = ({ locations, onEmployeeSelect, selectedEmployeeId }) => {
-  const [searchTerm, setSearchTerm] = useState(''); // State baru untuk menyimpan query pencarian
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Gunakan useMemo untuk memfilter daftar karyawan
-  // Ini akan mencegah proses filtering berjalan di setiap render
-  // hanya akan berjalan ketika 'locations' atau 'searchTerm' berubah
   const filteredEmployees = useMemo(() => {
     if (!searchTerm) {
-      return Object.values(locations); // Jika search bar kosong, tampilkan semua karyawan
+      return Object.values(locations);
     }
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
     return Object.values(locations).filter(loc =>
       loc.name.toLowerCase().includes(lowerCaseSearchTerm) ||
       loc.position.toLowerCase().includes(lowerCaseSearchTerm) ||
-      loc.id.toLowerCase().includes(lowerCaseSearchTerm) // Opsional: cari berdasarkan ID juga
+      loc.id.toLowerCase().includes(lowerCaseSearchTerm)
     );
   }, [locations, searchTerm]);
 
   return (
     <Box>
-      {/* Search Bar */}
       <TextField
         fullWidth
         label="Cari Karyawan..."
         variant="outlined"
-        size="small" // Ukuran kecil agar tidak terlalu besar
+        size="small"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        sx={{ mb: 2 }} // Margin bawah untuk memisahkan dari daftar
+        sx={{ mb: 2 }}
       />
 
       <List disablePadding>
-        {filteredEmployees.length > 0 ? ( // Gunakan filteredEmployees di sini
+        {filteredEmployees.length > 0 ? (
           filteredEmployees.map(loc => {
             const isSelected = loc.id === selectedEmployeeId;
+
+            // Memastikan loc.lastUpdate ada dan memiliki method toDate()
+            const lastUpdateDateTime = loc.lastUpdate && loc.lastUpdate.toDate ? loc.lastUpdate.toDate() : null;
 
             return (
               <ListItem
@@ -72,7 +71,11 @@ const EmployeeList = ({ locations, onEmployeeSelect, selectedEmployeeId }) => {
                     }
                     secondary={
                       <Typography variant="caption" sx={{ color: isSelected ? 'white' : '#999' }}>
-                        Update: {loc.lastUpdate && loc.lastUpdate.toDate ? loc.lastUpdate.toDate().toLocaleTimeString('id-ID') : 'N/A'}
+                        Update: {lastUpdateDateTime ? lastUpdateDateTime.toLocaleDateString('id-ID', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                }) + ' ' + lastUpdateDateTime.toLocaleTimeString('id-ID') : 'N/A'}
                       </Typography>
                     }
                     sx={{ color: isSelected ? 'white' : 'inherit' }}
@@ -82,7 +85,6 @@ const EmployeeList = ({ locations, onEmployeeSelect, selectedEmployeeId }) => {
             );
           })
         ) : (
-          // Pesan jika tidak ada karyawan yang ditemukan setelah filter
           <Typography variant="body2" sx={{ textAlign: 'center', color: '#777', mt: 2 }}>
             {searchTerm ? "Tidak ada karyawan ditemukan." : "Tidak ada data karyawan yang tersedia."}
           </Typography>

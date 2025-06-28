@@ -23,40 +23,69 @@ const GeofenceFormModal = ({ isOpen, onClose, onSave, initialData }) => {
 
     if (!isOpen) return null;
 
-    // --- LOGIKA BARU: Siapkan batas peta SEBELUM render ---
+    // --- LOGIKA BARU: Siapkan batas peta SEBELUM render (tidak berubah) ---
     let mapProps = {};
     const initialCoords = initialData?.coordinates;
 
     if (isEditMode && initialCoords && initialCoords.length > 0) {
-        // Jika mode edit dan ada koordinat, siapkan prop 'bounds'
         const bounds = initialCoords.map(c => [c.lat, c.lng]);
         mapProps = {
             bounds: bounds,
-            boundsOptions: { padding: [50, 50] } // Beri padding agar tidak terlalu mepet
+            boundsOptions: { padding: [50, 50] }
         };
     } else {
-        // Jika mode tambah, gunakan 'center' dan 'zoom' default
         mapProps = {
             center: [-4.5586, 105.4068],
             zoom: 9
         };
     }
 
-    // --- Fungsi Handler (tidak berubah) ---
-    const handleShapeChange = (e) => {
-        const layer = e.layers.getLayers()[0];
+    // --- FUNGSI BARU: Untuk memproses satu layer ---
+    const processLayer = (layer) => {
         if (!layer) {
             setEditedCoordinates(null);
             return;
         }
         const latlngs = layer.getLatLngs();
         const layerType = layer instanceof L.Polygon ? 'polygon' : 'polyline';
+        
+        // Poligon memiliki array latlngs bersarang [[]], sedangkan polyline tidak
         const coords = layerType === 'polygon' 
             ? latlngs[0].map(latlng => ({ lat: latlng.lat, lng: latlng.lng }))
             : latlngs.map(latlng => ({ lat: latlng.lat, lng: latlng.lng }));
+            
         setEditedCoordinates({ type: layerType, coordinates: coords });
     };
 
+    // --- HANDLER BARU: Untuk event onCreated ---
+    const handleCreate = (e) => {
+        // e.layer adalah layer yang baru dibuat
+        const layer = e.layer;
+        processLayer(layer);
+    };
+
+    // --- HANDLER BARU: Untuk event onEdited ---
+    const handleEdit = (e) => {
+        // e.layers berisi semua layer yang diubah
+        const layers = e.layers.getLayers();
+        if (layers.length > 0) {
+            // Ambil layer pertama yang diubah (biasanya hanya satu dalam kasus ini)
+            processLayer(layers[0]);
+        }
+    };
+    
+    // --- HANDLER BARU: Untuk event onDeleted ---
+    const handleDelete = () => {
+        setEditedCoordinates(null);
+        // Jika dalam mode edit, ini berarti kita ingin menghapus shape yang sudah ada
+        if(isEditMode) {
+             // Anda bisa set state untuk menandakan shape akan dihapus saat save
+             // atau langsung biarkan user menggambar yang baru
+             console.log("Shape yang ada dihapus dari peta.");
+        }
+    };
+
+    // --- Fungsi handleSubmit (tidak berubah) ---
     const handleSubmit = (e) => {
         e.preventDefault();
         const finalCoordinates = editedCoordinates ? editedCoordinates.coordinates : initialData?.coordinates;
@@ -78,7 +107,6 @@ const GeofenceFormModal = ({ isOpen, onClose, onSave, initialData }) => {
         onSave(geofenceData);
     };
 
-    // Siapkan layer poligon awal untuk ditampilkan sebagai referensi
     const initialShapePath = isEditMode && initialData?.coordinates 
         ? initialData.coordinates.map(c => [c.lat, c.lng]) : null;
 
@@ -97,23 +125,34 @@ const GeofenceFormModal = ({ isOpen, onClose, onSave, initialData }) => {
                 <form onSubmit={handleSubmit}>
                     <div style={{display: 'flex', gap: '20px'}}>
                         <div style={{ flex: 2, height: '400px', border: '1px solid #ccc' }}>
-                            {/* Gunakan {...mapProps} untuk menerapkan center/zoom atau bounds secara dinamis */}
                             <MapContainer key={initialData?.id || 'new'} {...mapProps} style={{ height: '100%', width: '100%' }}>
                                 <LayersControl position="topright">
                                     <LayersControl.BaseLayer checked name="Citra Satelit">
-                                        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution='&copy; Esri'/>
+                                        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution='© Esri'/>
                                     </LayersControl.BaseLayer>
                                     <LayersControl.BaseLayer name="Street Map">
-                                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap'/>
+                                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='© OpenStreetMap'/>
                                     </LayersControl.BaseLayer>
                                 </LayersControl>
                                 <FeatureGroup ref={featureGroupRef}>
                                     <EditControl
                                         position="topright"
-                                        onCreated={handleShapeChange}
-                                        onEdited={handleShapeChange}
-                                        onDeleted={() => setEditedCoordinates(null)}
-                                        draw={{ polygon: true, polyline: true, rectangle: false, circle: false, circlemarker: false, marker: false }}
+                                        // Gunakan handler yang sudah dipisah
+                                        onCreated={handleCreate}
+                                        onEdited={handleEdit}
+                                        onDeleted={handleDelete}
+                                        draw={{ 
+                                            polygon: true, 
+                                            polyline: true, 
+                                            rectangle: false, 
+                                            circle: false, 
+                                            circlemarker: false, 
+                                            marker: false 
+                                        }}
+                                        edit={{
+                                            // Penting: beritahu leaflet-draw featureGroup mana yang harus diedit
+                                            featureGroup: featureGroupRef.current,
+                                        }}
                                     />
                                     {/* Menampilkan shape yang sudah ada sebagai referensi */}
                                     {initialData?.type === 'polygon' && initialShapePath && <Polygon positions={initialShapePath} pathOptions={{ color: 'gray', dashArray: '5, 5' }} />}

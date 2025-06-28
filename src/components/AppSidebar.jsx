@@ -1,156 +1,167 @@
 import React, { useState } from 'react';
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import { Link, useLocation } from 'react-router-dom';
-import { FaTachometerAlt, FaHistory, FaBars, FaTimes, FaUsersCog, FaUser, FaGlobe } from 'react-icons/fa'; // Menambah ikon untuk sub-menu
+import { 
+  FaTachometerAlt, 
+  FaHistory, 
+  FaBars, 
+  FaUsersCog, 
+  FaUser, 
+  FaGlobe 
+} from 'react-icons/fa';
 
 const AppSidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
 
-  // --- START: Updated Styles & Structure ---
+  // --- PALET WARNA BERDASARKAN SCREENSHOT ---
+  const colors = {
+    primary: '#1e8e3e',      // Warna hijau utama
+    text: '#FFFFFF',          // Warna teks default (putih)
+    textSecondary: '#E0E0E0', // Teks sedikit redup
+    activeBg: '#FFFFFF',      // Latar belakang item aktif (putih)
+    activeText: '#333333',    // Warna teks item aktif (gelap)
+    hoverBg: '#1a7d37',       // Latar belakang saat hover (hijau lebih gelap)
+  };
 
-  // Gaya untuk container utama sidebar agar menempel di kiri dan tinggi penuh
   const sidebarContainerStyle = {
     display: 'flex',
-    height: '100vh', // Menggunakan 100vh agar sidebar mengambil tinggi viewport penuh
+    height: '100dvh',
     position: 'sticky',
     top: 0,
     zIndex: 1100,
-    // Kita tidak akan memberikan lebar spesifik di sini,
-    // biarkan react-pro-sidebar mengelola lebar saat collapsed/expanded.
-    boxShadow: '2px 0 5px rgba(0, 0, 0, 0.05)', // Sedikit bayangan di sisi kanan sidebar
-  };
-
-  const menuItemBaseStyle = {
-    // Warna teks default untuk menu item
-    color: '#E0E0E0', // Abu-abu terang untuk teks item menu
-    fontSize: '0.95rem', // Ukuran font sedikit lebih kecil
-    fontWeight: '500', // Sedikit lebih tebal
-  };
-
-  const menuItemHoverActiveStyle = {
-    // Warna teks dan latar belakang saat hover/active
-    color: '#FFD700', // Kuning keemasan untuk highlight
-    backgroundColor: '#1E2D3B', // Background lebih gelap dari #0b1d30 saat aktif/hover
-  };
-
-  const subMenuLabelStyle = {
-    color: '#E0E0E0',
-    fontSize: '0.95rem',
-    fontWeight: '500',
+    boxShadow: '2px 0px 10px rgba(0, 0, 0, 0.1)',
   };
 
   return (
     <div style={sidebarContainerStyle}>
       <Sidebar
         collapsed={isCollapsed}
-        backgroundColor="#1A2A38" // Warna latar belakang yang lebih gelap dan solid
-        breakPoint="md"
+        backgroundColor={colors.primary}
         rootStyles={{
-          // Gaya tambahan yang diterapkan ke elemen root Sidebar (jika diperlukan)
-          borderRight: 'none', // Menghapus border default jika ada
+          color: colors.textSecondary,
+          borderRight: 'none',
+          transition: 'width 0.3s ease-in-out',
         }}
       >
         <Menu
           menuItemStyles={{
-            button: ({ level, active }) => {
-              // Gaya dasar untuk semua level menu item
-              let style = { ...menuItemBaseStyle };
-
-              if (level === 0) { // Gaya untuk menu item level atas (parent)
-                style = {
-                  ...style,
-                  // Terapkan gaya hover/active di sini untuk level 0
-                  '&:hover': {
-                    ...menuItemHoverActiveStyle,
-                    backgroundColor: '#1E2D3B', // Konsisten dengan active
-                  },
-                  backgroundColor: active ? '#1E2D3B' : 'transparent', // Latar belakang saat aktif
-                  color: active ? '#FFD700' : '#E0E0E0', // Warna teks saat aktif
-                };
-              } else if (level === 1) { // Gaya untuk sub-menu item (child)
-                style = {
-                  ...style,
-                  paddingLeft: '35px', // Indentasi untuk sub-menu
-                  '&:hover': {
-                    ...menuItemHoverActiveStyle,
-                    backgroundColor: '#172430', // Sedikit lebih gelap dari parent hover
-                  },
-                  backgroundColor: active ? '#172430' : 'transparent',
-                  color: active ? '#FFD700' : '#C0C0C0', // Sedikit berbeda untuk anak
-                };
-              }
-
-              return style;
+            button: ({ level, active }) => ({
+              color: active ? colors.activeText : colors.text,
+              justifyContent: 'center',
+              backgroundColor: active ? colors.activeBg : 'transparent',
+              padding: '12px 20px',
+              margin: isCollapsed ? '5px 10px' : '5px 15px',
+              borderRadius: '8px',
+              fontWeight: active ? '600' : '500',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: active ? '#f2f2f2' : colors.hoverBg,
+                color: active ? colors.activeText : colors.text,
+              },
+              // Gaya spesifik untuk sub-menu (level 1)
+              ...(level === 1 && {
+                // Gaya dasar untuk sub-menu item
+                backgroundColor: active ? 'rgba(255, 255, 255, 0.9)' : 'transparent',
+                color: active ? colors.activeText : colors.textSecondary,
+                padding: '10px 20px 10px 30px',
+                margin: '2px 15px',
+                // Gaya HOVER yang disempurnakan
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)', // Latar belakang selalu hampir putih
+                  color: colors.activeText,                   // Teks selalu menjadi gelap
+                }
+              }),
+            }),
+            icon: {
+              fontSize: '1.2rem',
             },
-            // Gaya untuk SubMenu label (bagian yang bisa diklik untuk membuka sub-item)
-            subMenuContent: ({ active }) => ({
-              backgroundColor: '#1E2D3B', // Background untuk konten sub-menu saat terbuka
-              // Ini akan menjadi latar belakang dari drop-down menu
-            }),
-            label: ({ active }) => ({
-              ...subMenuLabelStyle,
-              color: active ? '#FFD700' : '#E0E0E0',
-            }),
+            SubMenu: {
+              // Styling untuk tombol induk SubMenu (cth: "Manajemen")
+              '.ps-menu-button': {
+                transition: 'background-color 0.2s ease',
+                '&:hover': {
+                  backgroundColor: colors.hoverBg,
+                }
+              },
+              // Ini mencegah highlight pada tombol induk saat hover di atas anak-anaknya.
+              // Logika ini lebih baik daripada solusi sebelumnya.
+              '&.ps-open > .ps-menu-button': {
+                backgroundColor: 'transparent !important',
+                
+              }
+            },
           }}
         >
-          {/* Header/Toggle Button */}
-          <MenuItem
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            icon={isCollapsed ? <FaBars /> : <FaTimes />}
-            style={{
-              textAlign: 'center',
-              margin: '15px 0 25px 0', // Sedikit lebih banyak margin bawah
-              color: '#FFD700', // Warna kuning keemasan untuk ikon toggle
-              fontSize: '1.2rem', // Ukuran ikon toggle
-            }}
-          >
+          {/* --- HEADER --- */}
+          <div style={{
+            padding: isCollapsed ? '20px 0' : '20px 25px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '20px',
+          }}>
             {!isCollapsed && (
-              <h2
+              <span
                 style={{
-                  margin: 0,
-                  fontSize: '1.3rem', // Ukuran font judul MENU
-                  color: '#FFD700',
-                  letterSpacing: '1px', // Tambah letter spacing
-                  fontWeight: 'bold', // Lebih tebal
+                  fontSize: '1.4rem',
+                  fontWeight: 'bold',
+                  color: colors.text,
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
                 }}
               >
-                MENU
-              </h2>
+                MandorApp
+              </span>
             )}
-          </MenuItem>
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: colors.textSecondary,
+                fontSize: '1.3rem',
+                margin: isCollapsed ? 'auto' : '0',
+                padding: '5px'
+              }}
+            >
+              <FaBars />
+            </button>
+          </div>
 
-          {/* Menu Item: Dasbor Real-time */}
           <MenuItem
             active={location.pathname === '/'}
             component={<Link to="/" />}
             icon={<FaTachometerAlt />}
           >
-            Dasbor Real-time
+            Dasbor
           </MenuItem>
 
-          {/* Menu Item: Riwayat Perjalanan */}
           <MenuItem
             active={location.pathname === '/history'}
             component={<Link to="/history" />}
             icon={<FaHistory />}
           >
-            Riwayat Perjalanan
+            Riwayat
           </MenuItem>
 
-          {/* SubMenu: Manajemen */}
-          <SubMenu label="Manajemen" icon={<FaUsersCog />}>
+          <SubMenu 
+            label="Manajemen" 
+            icon={<FaUsersCog />}
+            defaultOpen={location.pathname.startsWith('/management')}
+          >
             <MenuItem
               active={location.pathname === '/management/employees'}
               component={<Link to="/management/employees" />}
-              icon={<FaUser />} // Ikon untuk Karyawan
+              icon={<FaUser />}
             >
               Karyawan
             </MenuItem>
             <MenuItem
               active={location.pathname === '/management/geofences'}
               component={<Link to="/management/geofences" />}
-              icon={<FaGlobe />} // Ikon untuk Area Kerja
+              icon={<FaGlobe />}
             >
               Area Kerja
             </MenuItem>
