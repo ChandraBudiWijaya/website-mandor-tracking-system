@@ -1,84 +1,38 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Mengatur layout utama aplikasi */
-.app-container {
-  display: flex;
-  flex-direction: row;
-  min-height: 100vh; /* Pastikan tinggi aplikasi selalu penuh */
-}
-
-/* Menghilangkan margin & padding default dari browser */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Pembungkus utama, tinggi 100% layar, layout kolom (atas-bawah) */
+/* Pembungkus utama aplikasi.
+  Memastikan aplikasi mengisi seluruh tinggi layar.
+*/
 .app-wrapper {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden; /* Mencegah double scrollbar */
+  overflow: hidden;
 }
 
-/* Pembungkus untuk sidebar dan konten, layout baris (kiri-kanan) */
+/* Container untuk layout utama yang berisi Sidebar dan Konten.
+  Ini adalah kunci dari layout kita.
+*/
 .main-layout {
   display: flex;
-  flex-direction: row;
-  flex-grow: 1; /* Ambil sisa tinggi layar setelah dikurangi navbar */
-  overflow: hidden; /* Mencegah double scrollbar */
+  flex-direction: row; /* Menyusun sidebar dan konten secara horizontal */
+  flex: 1;           /* Mengisi sisa ruang setelah Navbar */
+  overflow: hidden;
 }
 
-/* Area konten utama */
+/* Area konten utama di sebelah kanan sidebar.*/
 .main-content {
-  flex-grow: 1; /* Ambil sisa lebar layar setelah dikurangi sidebar */
-  overflow-y: auto; /* Beri scroll HANYA pada area konten jika perlu */
-  padding: 0;
+  flex: 1;            /* Mengisi sisa ruang di sebelah sidebar */
+  overflow-y: auto;   /* Memberikan scroll jika kontennya panjang */
+  min-width: 0;       /* Mencegah konten 'mendorong' layout */
+  transition: all 0.3s ease-in-out;
 }
 
-/* Style untuk react-pro-sidebar (tetap sama) */
+/* Pengaturan kustom untuk react-pro-sidebar yang sudah Anda tentukan.*/
 .ps-sidebar-container {
   background-color: #008641 !important;
-}
-.ps-menu-button {
-  font-size: 1rem;
 }
