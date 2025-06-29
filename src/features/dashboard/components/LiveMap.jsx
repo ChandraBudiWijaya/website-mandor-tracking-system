@@ -1,71 +1,112 @@
-import React, { useEffect, useRef } from 'react';
+// src/features/dashboard/components/LiveMap.jsx
+
+import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// --- Ikon Default (Tidak Berubah) ---
-const DefaultIcon = L.icon({
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-  iconAnchor: [12, 41]
-});
-L.Marker.prototype.options.icon = DefaultIcon;
+// --- [PERUBAHAN UTAMA DI SINI] ---
+
+// Fungsi untuk menghasilkan warna unik berdasarkan string (misalnya, ID karyawan)
+const stringToColor = (str) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let color = '#';
+  for (let i = 0; i < 3; i++) {
+    const value = (hash >> (i * 8)) & 0xFF;
+    color += ('00' + value.toString(16)).substr(-2);
+  }
+  return color;
+};
+
+// Fungsi untuk membuat ikon marker kustom
+const createCustomIcon = (employee) => {
+  const markerHtml = `
+    <div style="
+      background-color: ${stringToColor(employee.id)};
+      width: 30px;
+      height: 30px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    ">
+      <div style="
+        transform: rotate(45deg);
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: 'Poppins', sans-serif;
+      ">
+        ${employee.name.charAt(0)}
+      </div>
+    </div>
+  `;
+
+  return L.divIcon({
+    html: markerHtml,
+    className: 'custom-leaflet-icon', // class ini tidak perlu style, hanya untuk identifikasi
+    iconSize: [30, 30],
+    iconAnchor: [15, 30], // Titik bawah dari marker
+    popupAnchor: [0, -30] // Popup muncul di atas marker
+  });
+};
+
+// --- AKHIR PERUBAHAN ---
 
 
-// --- KOMPONEN KONTROLER PETA (LOGIKA UTAMA DIPINDAH KE SINI) ---
+// Komponen untuk mengatur efek peta (zoom, pan, dll.)
 function MapEffect({ locations, selectedEmployeeId }) {
   const map = useMap();
-  // Gunakan ref untuk menandai apakah tampilan awal sudah diatur
-  const initialBoundsSet = useRef(false);
 
-  // --- EFEK 1: HANYA UNTUK TAMPILAN AWAL ---
   useEffect(() => {
-    // Jangan lakukan apa-apa jika:
-    // - Peta belum siap
-    // - Tampilan awal sudah pernah diatur
-    // - Belum ada data lokasi
-    if (!map || initialBoundsSet.current || Object.values(locations).length === 0) {
-      return;
-    }
-
-    const locationValues = Object.values(locations);
-    const latLngs = locationValues.map(loc => [loc.lat, loc.lng]);
-
-    if (latLngs.length > 0) {
-      console.log('Setting initial map bounds...');
-      map.fitBounds(latLngs, { padding: [50, 50], maxZoom: 15 });
-      // Tandai bahwa tampilan awal sudah selesai
-      initialBoundsSet.current = true;
-    }
-    // Dependency array ini memastikan efek berjalan saat peta & lokasi pertama kali tersedia,
-    // tapi 'if' di atas mencegahnya berjalan lagi.
-  }, [map, locations]);
-
-
-  // --- EFEK 2: HANYA UNTUK AKSI PEMILIHAN KARYAWAN OLEH PENGGUNA ---
-  useEffect(() => {
-    // Jangan lakukan apa-apa jika peta belum siap
     if (!map) return;
 
-    // Jika ada karyawan yang DIPILIH, terbang ke lokasinya
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+
+    const mapElement = map.getContainer();
+    if (mapElement) {
+      resizeObserver.observe(mapElement);
+    }
+
+    return () => {
+      if (mapElement) {
+        resizeObserver.unobserve(mapElement);
+      }
+    };
+  }, [map]);
+
+  useEffect(() => {
+    if (!map) return;
+
     if (selectedEmployeeId && locations[selectedEmployeeId]) {
       const { lat, lng } = locations[selectedEmployeeId];
-      console.log(`Flying to selected employee: ${selectedEmployeeId}`);
       map.flyTo([lat, lng], 16, {
         animate: true,
         duration: 1.5
       });
+    } else {
+      const locationValues = Object.values(locations);
+      if (locationValues.length === 0) return;
+
+      const latLngs = locationValues.map(loc => [loc.lat, loc.lng]);
+      if (latLngs.length > 0) {
+        map.fitBounds(latLngs, { padding: [50, 50], maxZoom: 15 });
+      }
     }
-    // TIDAK ADA 'else' DI SINI. Jika tidak ada yang dipilih, kita tidak melakukan apa-apa.
-    // Peta akan tetap pada posisi terakhirnya.
-  }, [map, selectedEmployeeId, locations]); // 'locations' dibutuhkan untuk mendapatkan koordinat terbaru dari karyawan yang dipilih
+  }, [locations, selectedEmployeeId, map]);
 
   return null;
 }
 
-
-// --- KOMPONEN UTAMA (Tampilan Peta) ---
-const LiveMap = ({ locations, selectedEmployeeId, customHeight }) => {
+const LiveMap = ({ locations, selectedEmployeeId }) => {
   const initialPosition = [-2.74833, 107.64306];
   const initialZoom = 13;
 
@@ -73,31 +114,30 @@ const LiveMap = ({ locations, selectedEmployeeId, customHeight }) => {
     <MapContainer
       center={initialPosition}
       zoom={initialZoom}
-      style={{
-        height: customHeight || '100%',
-        width: '100%',
-        backgroundColor: '#f0f0f0',
-        minHeight: '200px',
-      }}
+      className="h-full w-full bg-gray-200 min-h-[200px]"
     >
       <LayersControl position="topright">
         <LayersControl.BaseLayer checked name="Street Map">
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
         </LayersControl.BaseLayer>
         <LayersControl.BaseLayer name="Citra Satelit">
           <TileLayer
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            attribution='© Esri — Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            attribution='&copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
           />
         </LayersControl.BaseLayer>
       </LayersControl>
 
-      {/* React akan secara efisien me-render ulang marker yang posisinya berubah */}
       {Object.values(locations).map(loc => (
-        <Marker key={loc.id} position={[loc.lat, loc.lng]}>
+        // [PERUBAHAN] Menggunakan ikon kustom
+        <Marker 
+          key={loc.id} 
+          position={[loc.lat, loc.lng]} 
+          icon={createCustomIcon(loc)} // Terapkan ikon kustom di sini
+        >
           <Popup>
             <b>{loc.name}</b><br />
             Posisi: {loc.position}<br />
@@ -106,7 +146,6 @@ const LiveMap = ({ locations, selectedEmployeeId, customHeight }) => {
         </Marker>
       ))}
 
-      {/* Komponen controller yang berisi semua logika efek peta */}
       <MapEffect locations={locations} selectedEmployeeId={selectedEmployeeId} />
     </MapContainer>
   );

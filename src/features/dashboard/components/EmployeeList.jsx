@@ -1,10 +1,20 @@
-import React, { useState, useMemo } from 'react';
-import { List, ListItem, ListItemButton, ListItemText, Typography, Box, TextField } from '@mui/material';
+// src/features/dashboard/components/EmployeeList.jsx
 
-const EmployeeList = ({ locations, onEmployeeSelect, selectedEmployeeId }) => {
+import React, { useState, useMemo } from 'react';
+
+// Komponen Placeholder untuk foto profil
+const ProfilePlaceholder = ({ employee }) => (
+  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+    {/* Mengambil inisial dari nama karyawan */}
+    {employee.name.charAt(0)}
+  </div>
+);
+
+const EmployeeList = ({ locations, onEmployeeSelect, selectedEmployeeId, isCollapsed }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredEmployees = useMemo(() => {
+    // Memoization untuk filtering agar lebih efisien
     if (!searchTerm) {
       return Object.values(locations);
     }
@@ -16,81 +26,79 @@ const EmployeeList = ({ locations, onEmployeeSelect, selectedEmployeeId }) => {
     );
   }, [locations, searchTerm]);
 
-  return (
-    <Box>
-      <TextField
-        fullWidth
-        label="Cari Karyawan..."
-        variant="outlined"
-        size="small"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        sx={{ mb: 2 }}
-      />
+  // Jika sidebar tertutup, tampilkan hanya avatar/placeholder
+  if (isCollapsed) {
+    return (
+      <ul className="list-none p-2 m-0">
+        {filteredEmployees.map(loc => {
+          const isSelected = loc.id === selectedEmployeeId;
+          return (
+            <li key={loc.id} title={loc.name}>
+              <button
+                onClick={() => onEmployeeSelect(loc.id)}
+                className={`w-full flex justify-center items-center p-2 my-1 rounded-lg transition-all duration-200 ${isSelected ? 'bg-green-700' : 'hover:bg-gray-200'}`}
+              >
+                <ProfilePlaceholder employee={loc} />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
 
-      <List disablePadding>
+  // Tampilan normal saat sidebar terbuka
+  return (
+    <div className="flex flex-col h-full px-4 pt-2 pb-4">
+      {/* [INI PERUBAHANNYA] Search Bar ditambahkan kembali */}
+      <div className="relative mb-4">
+        <input
+          type="text"
+          placeholder="Cari Karyawan..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+        />
+      </div>
+
+      <ul className="list-none p-0 m-0 flex-grow overflow-y-auto">
         {filteredEmployees.length > 0 ? (
           filteredEmployees.map(loc => {
             const isSelected = loc.id === selectedEmployeeId;
-
-            // Memastikan loc.lastUpdate ada dan memiliki method toDate()
-            const lastUpdateDateTime = loc.lastUpdate && loc.lastUpdate.toDate ? loc.lastUpdate.toDate() : null;
+            const lastUpdateTime = loc.lastUpdate?.toDate
+              ? loc.lastUpdate.toDate().toLocaleString('id-ID', {
+                day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+              })
+              : 'N/A';
 
             return (
-              <ListItem
+              <li
                 key={loc.id}
-                disablePadding
-                sx={{
-                  backgroundColor: isSelected ? 'primary.light' : '#FFFFFF',
-                  color: isSelected ? 'primary.contrastText' : 'inherit',
-                  borderRadius: '6px',
-                  mb: 1,
-                  boxShadow: isSelected ? '0 2px 4px rgba(0,0,0,0.1)' : 'none',
-                  transition: 'background-color 0.3s ease, box-shadow 0.3s ease, border 0.3s ease',
-                  border: isSelected ? '1px solid' : '1px solid #E0E0E0',
-                  borderColor: isSelected ? 'primary.main' : '#E0E0E0',
-                }}
+                onClick={() => onEmployeeSelect(loc.id)}
+                className={`mb-2 rounded-lg cursor-pointer transition-all duration-200 flex items-center p-3 gap-3 ${isSelected ? 'bg-green-700 text-white shadow-md' : 'bg-white border border-gray-200 hover:bg-gray-50'}`}
               >
-                <ListItemButton
-                  onClick={() => onEmployeeSelect(loc.id)}
-                  sx={{
-                    py: 1.5,
-                    px: 2,
-                    borderRadius: '6px',
-                    '&:hover': {
-                      backgroundColor: isSelected ? 'primary.main' : '#F5F5F5',
-                      color: isSelected ? 'white' : '#333',
-                    },
-                  }}
-                >
-                  <ListItemText
-                    primary={
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                        {loc.name} <Typography component="span" variant="body2" sx={{ color: isSelected ? 'white' : '#777' }}>({loc.position})</Typography>
-                      </Typography>
-                    }
-                    secondary={
-                      <Typography variant="caption" sx={{ color: isSelected ? 'white' : '#999' }}>
-                        Update: {lastUpdateDateTime ? lastUpdateDateTime.toLocaleDateString('id-ID', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                }) + ' ' + lastUpdateDateTime.toLocaleTimeString('id-ID') : 'N/A'}
-                      </Typography>
-                    }
-                    sx={{ color: isSelected ? 'white' : 'inherit' }}
-                  />
-                </ListItemButton>
-              </ListItem>
+                <ProfilePlaceholder employee={loc} />
+                <div className="flex-grow">
+                  <p className={`font-semibold text-base ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                    {loc.name}
+                  </p>
+                  <p className={`text-sm ${isSelected ? 'text-gray-200' : 'text-gray-600'}`}>
+                    {loc.position}
+                  </p>
+                  <p className={`text-xs mt-1 ${isSelected ? 'text-gray-300' : 'text-gray-500'}`}>
+                    Update: {lastUpdateTime}
+                  </p>
+                </div>
+              </li>
             );
           })
         ) : (
-          <Typography variant="body2" sx={{ textAlign: 'center', color: '#777', mt: 2 }}>
-            {searchTerm ? "Tidak ada karyawan ditemukan." : "Tidak ada data karyawan yang tersedia."}
-          </Typography>
+          <div className="text-center text-gray-500 mt-4">
+            <p>{searchTerm ? "Tidak ada karyawan ditemukan." : "Tidak ada data karyawan."}</p>
+          </div>
         )}
-      </List>
-    </Box>
+      </ul>
+    </div>
   );
 };
 
