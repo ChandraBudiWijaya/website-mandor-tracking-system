@@ -1,130 +1,100 @@
+// src/components/AppSidebar.jsx
+
 import React, { useState } from 'react';
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  FaTachometerAlt, 
-  FaHistory, 
-  FaBars, 
-  FaUsersCog, 
-  FaUser, 
-  FaGlobe 
+import {
+  FaTachometerAlt,
+  FaHistory,
+  FaBars,
+  FaUsersCog,
+  FaUser,
+  FaGlobe
 } from 'react-icons/fa';
 
 const AppSidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
 
-  // --- PALET WARNA BERDASARKAN SCREENSHOT ---
   const colors = {
-    primary: '#1e8e3e',      // Warna hijau utama
-    text: '#FFFFFF',          // Warna teks default (putih)
-    textSecondary: '#E0E0E0', // Teks sedikit redup
-    activeBg: '#FFFFFF',      // Latar belakang item aktif (putih)
-    activeText: '#333333',    // Warna teks item aktif (gelap)
-    hoverBg: '#1a7d37',       // Latar belakang saat hover (hijau lebih gelap)
-  };
-
-  const sidebarContainerStyle = {
-    display: 'flex',
-    height: '100dvh',
-    position: 'sticky',
-    top: 0,
-    zIndex: 1100,
-    boxShadow: '2px 0px 10px rgba(0, 0, 0, 0.1)',
+    primary: '#1e8e3e',
+    activeBg: '#FFFFFF',
+    activeText: '#333333',
+    hoverBg: '#1a7d37',
   };
 
   return (
-    <div style={sidebarContainerStyle}>
+    <div className="flex h-dvh sticky top-0 z-[1100] shadow-[2px_0px_10px_rgba(0,0,0,0.1)]">
       <Sidebar
         collapsed={isCollapsed}
         backgroundColor={colors.primary}
         rootStyles={{
-          color: colors.textSecondary,
+          color: '#E0E0E0',
           borderRight: 'none',
-          transition: 'width 0.3s ease-in-out',
+          transition: 'all 0.3s ease-in-out',
         }}
       >
         <Menu
           menuItemStyles={{
             button: ({ level, active }) => ({
-              color: active ? colors.activeText : colors.text,
+              display: 'flex',
+              alignItems: 'center',
               justifyContent: 'center',
+
+              color: active ? colors.activeText : '#FFFFFF',
               backgroundColor: active ? colors.activeBg : 'transparent',
-              padding: '12px 20px',
               margin: isCollapsed ? '5px 10px' : '5px 15px',
               borderRadius: '8px',
               fontWeight: active ? '600' : '500',
+              padding: level === 1 ? '10px 20px 10px 30px' : '12px 20px',
               transition: 'all 0.2s ease',
               '&:hover': {
                 backgroundColor: active ? '#f2f2f2' : colors.hoverBg,
-                color: active ? colors.activeText : colors.text,
+                color: active ? colors.activeText : '#fffff9',
               },
-              // Gaya spesifik untuk sub-menu (level 1)
-              ...(level === 1 && {
-                // Gaya dasar untuk sub-menu item
-                backgroundColor: active ? 'rgba(255, 255, 255, 0.9)' : 'transparent',
-                color: active ? colors.activeText : colors.textSecondary,
-                padding: '10px 20px 10px 30px',
-                margin: '2px 15px',
-                // Gaya HOVER yang disempurnakan
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)', // Latar belakang selalu hampir putih
-                  color: colors.activeText,                   // Teks selalu menjadi gelap
-                }
+              ...(level === 1 && active && {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                color: colors.activeText,
               }),
+              ...(level === 1 && {
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  color: colors.activeText,
+                }
+              })
             }),
             icon: {
               fontSize: '1.2rem',
+              // Menjaga agar warna ikon tetap saat item aktif
+              color: 'inherit',
             },
             SubMenu: {
-              // Styling untuk tombol induk SubMenu (cth: "Manajemen")
               '.ps-menu-button': {
                 transition: 'background-color 0.2s ease',
                 '&:hover': {
                   backgroundColor: colors.hoverBg,
                 }
               },
-              // Ini mencegah highlight pada tombol induk saat hover di atas anak-anaknya.
-              // Logika ini lebih baik daripada solusi sebelumnya.
+              
               '&.ps-open > .ps-menu-button': {
                 backgroundColor: 'transparent !important',
-                
               }
             },
+            subMenuContent: {
+              backgroundColor: colors.primary,
+            }
           }}
         >
-          {/* --- HEADER --- */}
-          <div style={{
-            padding: isCollapsed ? '20px 0' : '20px 25px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '20px',
-          }}>
+          {/* Header */}
+          <div className={`flex items-center justify-between mb-5 ${isCollapsed ? 'p-5 py-5' : 'px-6 py-5'}`}>
             {!isCollapsed && (
-              <span
-                style={{
-                  fontSize: '1.4rem',
-                  fontWeight: 'bold',
-                  color: colors.text,
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}
-              >
+              <span className="text-xl font-bold text-white uppercase tracking-wider">
                 MandorApp
               </span>
             )}
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                color: colors.textSecondary,
-                fontSize: '1.3rem',
-                margin: isCollapsed ? 'auto' : '0',
-                padding: '5px'
-              }}
+              className={`bg-none border-none cursor-pointer text-gray-300 text-xl p-1.5 ${isCollapsed ? 'mx-auto' : ''}`}
             >
               <FaBars />
             </button>
@@ -146,8 +116,8 @@ const AppSidebar = () => {
             Riwayat
           </MenuItem>
 
-          <SubMenu 
-            label="Manajemen" 
+          <SubMenu
+            label="Manajemen"
             icon={<FaUsersCog />}
             defaultOpen={location.pathname.startsWith('/management')}
           >
