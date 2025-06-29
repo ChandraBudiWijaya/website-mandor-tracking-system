@@ -1,155 +1,176 @@
-import React, { useState, useMemo } from 'react'; // Impor useMemo untuk optimasi
+import React, { useState } from 'react';
 import { useGeofences } from '../../hooks/useGeofences';
-import GeofenceDetailModal from './components/GeofenceDetailModal';
+import GeofenceFormModal from './components/GeofenceFormModal';
 import { db } from '../../api/firebaseConfig';
 import { doc, setDoc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+
+// Import komponen MUI
+import {
+  Typography,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Alert,
+  Box, // Impor Box untuk layouting
+  CircularProgress // Impor CircularProgress
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function GeofenceManagementPage() {
     const { geofences, loading, setGeofences } = useGeofences();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    
-    const [modalMode, setModalMode] = useState(null); 
-    const [selectedGeofence, setSelectedGeofence] = useState(null);
+    const [editingGeofence, setEditingGeofence] = useState(null);
+    const [pageError, setPageError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const [isSaving, setIsSaving] = useState(false); // State untuk loading saat menyimpan
 
-    // --- 1. TAMBAHKAN STATE UNTUK SEARCH BAR ---
-    const [searchQuery, setSearchQuery] = useState('');
+    const handleOpenAddModal = () => {
+        setEditingGeofence(null);
+        setIsModalOpen(true);
+    };
 
-    const handleOpenModal = (mode, geofence = null) => {
-        setModalMode(mode);
-        setSelectedGeofence(geofence);
+    const handleOpenEditModal = (geofence) => {
+        setEditingGeofence(geofence);
         setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
-        setModalMode(null);
-        setSelectedGeofence(null);
+        setEditingGeofence(null);
     };
 
     const handleSaveGeofence = async (geofenceData) => {
         const { id, ...data } = geofenceData;
-        if (!id) return alert("ID Area tidak boleh kosong!");
+        setPageError('');
+        setSuccessMessage('');
+        setIsSaving(true); // Mulai loading
+
+        if (!id) {
+            setPageError("ID Area tidak boleh kosong!");
+            setIsSaving(false); // Hentikan loading jika ada error validasi
+            return;
+        }
 
         try {
             const geofenceRef = doc(db, "geofences", id);
 
-            if (modalMode === 'edit') {
+            if (editingGeofence) {
                 await updateDoc(geofenceRef, data);
                 setGeofences(prev => prev.map(g => g.id === id ? { id, ...data } : g));
-                alert("Area berhasil diupdate!");
-            } else if (modalMode === 'add') {
+                setSuccessMessage(`Area kerja "${data.name}" berhasil diupdate.`);
+            } else {
                 const docSnap = await getDoc(geofenceRef);
                 if (docSnap.exists()) {
-                    alert(`Error: Area dengan ID "${id}" sudah ada!`);
+                    setPageError(`Error: Area dengan ID "${id}" sudah ada!`);
+                    setIsSaving(false); // Hentikan loading
                     return;
                 }
                 await setDoc(geofenceRef, data);
                 setGeofences(prev => [...prev, { id, ...data }].sort((a,b) => a.name.localeCompare(b.name)));
-                alert("Area baru berhasil ditambahkan!");
+                setSuccessMessage(`Area kerja baru "${data.name}" berhasil ditambahkan.`);
             }
             handleCloseModal();
         } catch (e) {
             console.error("Error saving geofence: ", e);
-            alert("Gagal menyimpan area!");
+            setPageError("Gagal menyimpan area kerja! " + e.message);
+        } finally {
+            setIsSaving(false); // Selalu hentikan loading di akhir
         }
     };
 
     const handleDeleteGeofence = async (geofenceId) => {
-        if (window.confirm(`Yakin ingin menghapus area ID: ${geofenceId}?`)) {
+        if (window.confirm(`Yakin ingin menghapus area kerja dengan ID: ${geofenceId}?`)) {
+            setPageError('');
+            setSuccessMessage('');
             try {
                 await deleteDoc(doc(db, "geofences", geofenceId));
                 setGeofences(prev => prev.filter(g => g.id !== geofenceId));
-                alert("Area berhasil dihapus!");
+                setSuccessMessage(`Area kerja dengan ID "${geofenceId}" berhasil dihapus.`);
             } catch (e) {
                 console.error("Error deleting geofence: ", e);
-                alert("Gagal menghapus area!");
+                setPageError("Gagal menghapus area kerja! " + e.message);
             }
         }
     };
     
-    // --- 3. BUAT LOGIKA FILTER ---
-    // Gunakan useMemo agar filter tidak berjalan di setiap render, hanya saat geofences atau searchQuery berubah.
-    const filteredGeofences = useMemo(() => {
-        if (!searchQuery) {
-            return geofences; // Jika search bar kosong, kembalikan semua data
-        }
-        return geofences.filter(geo => 
-            geo.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-            geo.id.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    }, [geofences, searchQuery]);
-
-
-    // Styles
-    const tableHeaderStyle = { background: '#f2f2f2', padding: '12px', textAlign: 'left', borderBottom: '2px solid #ddd' };
-    const tableCellStyle = { padding: '12px', borderBottom: '1px solid #ddd', verticalAlign: 'middle' };
-    const buttonStyle = { marginRight: '5px', padding: '5px 10px', cursor: 'pointer', border: '1px solid #ccc', borderRadius: '4px', fontSize: '14px' };
-    const viewButtonStyle = { ...buttonStyle, background: '#e0e0e0'};
-    const editButtonStyle = { ...buttonStyle, background: '#d4edda'};
-    const deleteButtonStyle = { ...buttonStyle, background: '#f8d7da', color: '#721c24'};
-    const searchInputStyle = { padding: '10px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '4px', width: '300px' };
-
     return (
-        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-            <h1>Manajemen Area Kerja (Geofence)</h1>
-            <p>Di halaman ini Anda bisa menambah, melihat, mengubah, dan menghapus data area kerja.</p>
+        <div className="p-5 bg-gray-50 min-h-[calc(100vh-70px)]">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                Manajemen Area Kerja (Geofence)
+            </h1>
+            <p className="mb-6 text-gray-600">
+                Di halaman ini Anda bisa menambah, mengubah, dan menghapus data area kerja.
+            </p>
             
-            {/* --- 2. TAMBAHKAN UI UNTUK KONTROL ATAS TABEL --- */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <input
-                    type="text"
-                    placeholder="Cari berdasarkan nama atau ID..."
-                    style={searchInputStyle}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button onClick={() => handleOpenModal('add')} style={{padding: '10px 15px', cursor: 'pointer', fontSize: '16px'}}>+ Tambah Area Baru</button>
+            <div className="mb-5">
+                <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={handleOpenAddModal}
+                    className="w-full sm:w-auto bg-green-700 hover:bg-green-800"
+                    style={{ textTransform: 'none', padding: '8px 16px', borderRadius: '8px' }}
+                >
+                    Tambah Area Baru
+                </Button>
             </div>
 
-            <GeofenceDetailModal 
+            {successMessage && <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccessMessage('')}>{successMessage}</Alert>}
+            {pageError && <Alert severity="error" sx={{ mb: 3 }} onClose={() => setPageError('')}>{pageError}</Alert>}
+
+            <GeofenceFormModal 
                 isOpen={isModalOpen}
-                mode={modalMode}
                 onClose={handleCloseModal}
                 onSave={handleSaveGeofence}
-                initialData={selectedGeofence}
+                initialData={editingGeofence}
+                isSaving={isSaving}
             />
             
-            {loading ? <p>Memuat data area...</p> : (
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                    <thead>  
-                        <tr>
-                            <th style={tableHeaderStyle}>ID Area</th>
-                            <th style={tableHeaderStyle}>Nama Area</th>
-                            <th style={tableHeaderStyle}>Ditugaskan ke (ID)</th>
-                            <th style={tableHeaderStyle}>Jumlah Titik</th>
-                            <th style={tableHeaderStyle}>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {/* --- 4. RENDER HASIL FILTER --- */}
-                        {filteredGeofences.length > 0 ? (
-                            filteredGeofences.map(geo => (
-                                <tr key={geo.id}>
-                                    <td style={tableCellStyle}>{geo.id}</td>
-                                    <td style={tableCellStyle}>{geo.name}</td>
-                                    <td style={tableCellStyle}>{geo.assignedTo}</td>
-                                    <td style={tableCellStyle}>{geo.coordinates ? geo.coordinates.length : 0} Titik</td>
-                                    <td style={tableCellStyle}>
-                                        <button onClick={() => handleOpenModal('view', geo)} style={viewButtonStyle}>Lihat</button>
-                                        <button onClick={() => handleOpenModal('edit', geo)} style={editButtonStyle}>Edit</button>
-                                        <button onClick={() => handleDeleteGeofence(geo.id)} style={deleteButtonStyle}>Hapus</button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="5" style={{...tableCellStyle, textAlign: 'center', fontStyle: 'italic', color: '#777'}}>
-                                    Tidak ada data yang cocok dengan pencarian Anda.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+            {/* --- [PERBAIKAN DI SINI] --- */}
+            {loading ? (
+                <Box className="flex justify-center items-center h-64">
+                    <CircularProgress />
+                    <Typography className="ml-4 text-gray-600">Memuat data area kerja...</Typography>
+                </Box>
+            ) : (
+                <TableContainer component={Paper} elevation={4} className="rounded-xl">
+                    <Table>
+                        <TableHead className="bg-gray-50">  
+                            <TableRow>
+                                <TableCell className="font-bold text-gray-600">ID Area</TableCell>
+                                <TableCell className="font-bold text-gray-600">Nama Area</TableCell>
+                                <TableCell className="font-bold text-gray-600">Ditugaskan ke (ID)</TableCell>
+                                <TableCell className="font-bold text-gray-600">Jumlah Titik</TableCell>
+                                <TableCell className="font-bold text-gray-600 text-center">Aksi</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {geofences.map(geo => (
+                                <TableRow key={geo.id} className="hover:bg-gray-50">
+                                    <TableCell>{geo.id}</TableCell>
+                                    <TableCell>{geo.name}</TableCell>
+                                    <TableCell>{geo.assignedTo}</TableCell>
+                                    <TableCell>{geo.coordinates ? geo.coordinates.length : 0} Titik</TableCell>
+                                    <TableCell className="text-center">
+                                        <IconButton size="small" onClick={() => handleOpenEditModal(geo)} sx={{ color: 'primary.main' }}>
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
+                                        <IconButton size="small" onClick={() => handleDeleteGeofence(geo.id)} sx={{ color: 'error.main' }}>
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             )}
         </div>
     );
