@@ -1,63 +1,48 @@
+// src/features/history/components/SummaryPanel.jsx
+
 import React from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import { Box, Paper, Typography, CircularProgress, Alert } from '@mui/material';
+// Komponen MUI yang masih kita butuhkan
+import { CircularProgress, Alert } from '@mui/material';
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const SummaryPanel = ({ summary, loading, error }) => {
-  const panelContainerStyle = {
-    padding: { xs: 2, md: 3 },
-    borderRadius: '12px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  };
-
-  const detailSectionStyle = {
-    marginTop: '25px',
-    textAlign: 'center',
-    width: '100%',
-  };
+  // Container utama dengan styling Tailwind
+  const panelContainerClass = "p-4 md:p-6 rounded-xl shadow-lg h-full flex flex-col items-center bg-white";
 
   if (loading) {
     return (
-      <Paper elevation={4} sx={panelContainerStyle}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 5 }}>
-          <CircularProgress sx={{ color: 'primary.main' }} size={40} />
-          <Typography variant="subtitle1" sx={{ mt: 2, color: '#555' }}>
-            Mencari data ringkasan...
-          </Typography>
-        </Box>
-      </Paper>
+      <div className={`${panelContainerClass} justify-center`}>
+        <CircularProgress size={40} />
+        <p className="mt-3 text-gray-600">Mencari data ringkasan...</p>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Paper elevation={4} sx={panelContainerStyle}>
-        <Alert severity="error" sx={{ width: '100%' }}>
+      <div className={panelContainerClass}>
+        <Alert severity="error" className="w-full">
           Gagal memuat data ringkasan. Silakan coba lagi.
         </Alert>
-      </Paper>
+      </div>
     );
   }
 
   if (!summary) {
     return (
-      <Paper elevation={4} sx={panelContainerStyle}>
-        <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 600, mb: 2 }}>
+      <div className={`${panelContainerClass} justify-center text-center`}>
+        <h2 className="text-xl font-bold text-green-700 mb-2">
           Ringkasan Harian
-        </Typography>
-        <Typography variant="body1" sx={{ color: '#666', textAlign: 'center' }}>
+        </h2>
+        <p className="text-gray-600">
           Data ringkasan aktivitas akan muncul di sini setelah ada perjalanan.
-        </Typography>
-      </Paper>
+        </p>
+      </div>
     );
   }
 
@@ -70,14 +55,8 @@ const SummaryPanel = ({ summary, loading, error }) => {
     datasets: [
       {
         data: [summary.totalWorkMinutes, summary.totalOutsideAreaMinutes],
-        backgroundColor: [
-          '#2b8c3d',
-          '#E74C3C',
-        ],
-        borderColor: [
-          '#FFFFFF',
-          '#FFFFFF',
-        ],
+        backgroundColor: ['#2b8c3d', '#E74C3C'],
+        borderColor: ['#FFFFFF', '#FFFFFF'],
         borderWidth: 3,
       },
     ],
@@ -93,10 +72,7 @@ const SummaryPanel = ({ summary, loading, error }) => {
         position: 'bottom',
         labels: {
           padding: 25,
-          font: {
-            size: 13,
-            family: 'Roboto, sans-serif'
-          },
+          font: { size: 13, family: 'Poppins, sans-serif' },
           boxWidth: 20,
         },
       },
@@ -104,61 +80,48 @@ const SummaryPanel = ({ summary, loading, error }) => {
         formatter: (value, context) => {
           if (value === 0) return null;
           const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-          const percentage = (value / total * 100).toFixed(1);
+          const percentage = ((value / total) * 100).toFixed(1);
           return `${percentage}%`;
         },
         color: '#333',
         font: {
           weight: 'bold',
           size: 15,
-          family: 'Roboto, sans-serif'
+          family: 'Poppins, sans-serif'
         },
         anchor: 'center',
         align: 'center',
       },
       tooltip: {
-        bodyFont: {
-          size: 14,
-        },
-        titleFont: {
-          size: 15,
-          weight: 'bold',
-        },
+        bodyFont: { size: 14 },
+        titleFont: { size: 15, weight: 'bold' },
         padding: 10,
       }
     },
   };
 
   return (
-    <Paper elevation={4} sx={panelContainerStyle}>
-      <Typography variant="h6" sx={{ textAlign: 'center', mb: 2, color: 'primary.main', fontWeight: 700 }}>
+    <div className={panelContainerClass}>
+      <h2 className="text-xl text-center mb-4 text-green-700 font-bold">
         Ringkasan Aktivitas Harian
-      </Typography>
+      </h2>
 
-      <Box sx={{ height: '250px', width: '100%', position: 'relative' }}>
+      <div className="h-[250px] w-full relative">
         <Doughnut options={chartOptions} data={chartData} plugins={[ChartDataLabels]} />
-      </Box>
+      </div>
 
-      <Box sx={{ ...detailSectionStyle, fontSize: '0.9em' }}>
-        <p style={{ margin: '0 0 8px 0', color: '#444' }}>
+      <div className="mt-6 text-center w-full text-sm">
+        <p className="mb-2 text-gray-700">
           <strong>Di Area Kerja:</strong> {summary.totalWorkMinutes.toFixed(1)} menit ({workPercentage.toFixed(1)}%)
         </p>
-        <p style={{ margin: '0 0 8px 0', color: '#444' }}>
+        <p className="mb-2 text-gray-700">
           <strong>Di Luar Area:</strong> {summary.totalOutsideAreaMinutes.toFixed(1)} menit ({outsidePercentage.toFixed(1)}%)
         </p>
-        {/* --- START: Ganti penggunaan updateInfoStyle dengan inline style langsung --- */}
-        <p style={{
-            marginTop: '20px',
-            color: '#666',
-            borderTop: '1px solid #eee',
-            paddingTop: '15px',
-            margin: 0 // Pastikan margin juga diatur di sini
-        }}>
-          Update Terakhir: {summary.lastUpdate && summary.lastUpdate.toDate ? summary.lastUpdate.toDate().toLocaleString('id-ID') : 'N/A'}
+        <p className="mt-5 text-gray-500 border-t border-gray-200 pt-4">
+          Update Terakhir: {summary.lastUpdate?.toDate ? summary.lastUpdate.toDate().toLocaleString('id-ID') : 'N/A'}
         </p>
-        {/* --- END: Ganti penggunaan updateInfoStyle dengan inline style langsung --- */}
-      </Box>
-    </Paper>
+      </div>
+    </div>
   );
 };
 

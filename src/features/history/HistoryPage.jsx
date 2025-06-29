@@ -1,31 +1,33 @@
+// src/features/history/HistoryPage.jsx
+
 import React, { useState } from 'react';
 import { useEmployees } from '../../hooks/useEmployees';
 import { useHistoryData } from './hooks/useHistoryData';
 import HistoryMap from './components/HistoryMap';
 import SummaryPanel from './components/SummaryPanel';
-
 import {
-  Box,
-  Typography,
-  Button,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   TextField,
-  Divider,
   CircularProgress,
+  Button,
+  Box,
+  Typography,
+  Alert,
 } from '@mui/material';
 
 function HistoryPage() {
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
+  const [isSearched, setIsSearched] = useState(false);
   const { employees, loading: loadingEmployees } = useEmployees();
-
   const { logs, summary, geofence, loading: loadingHistory, error, fetchData } = useHistoryData();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsSearched(true);
     if (!selectedEmployee || !selectedDate) {
       alert('Silakan pilih karyawan dan tanggal terlebih dahulu.');
       return;
@@ -34,116 +36,85 @@ function HistoryPage() {
   };
 
   return (
-    <Box sx={{ padding: '20px', backgroundColor: '#F8F9FA', minHeight: 'calc(100vh - 70px)' }}>
-      <Typography variant="h4" sx={{ mb: 3, color: '#333', fontWeight: 600 }}>
+    <div className="p-5 bg-gray-50 min-h-[calc(100vh-70px)]">
+      <Typography variant="h4" className="text-3xl font-bold text-gray-800 mb-4">
         Riwayat Perjalanan
       </Typography>
 
+      {/* Form Pencarian */}
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{
-          marginBottom: '20px',
-          padding: '20px',
-          backgroundColor: '#FFFFFF',
-          borderRadius: '12px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: { xs: 2, sm: 2 },
-          alignItems: { xs: 'stretch', sm: 'flex-end' },
-          justifyContent: 'flex-start',
-          flexWrap: 'wrap',
-        }}
+        className="mb-5 p-5 bg-white rounded-xl shadow-md flex flex-col sm:flex-row flex-wrap items-end gap-4"
       >
-        <Box sx={{
-            width: { xs: '100%', sm: '180px', md: '200px' },
-            flexShrink: 0,
-        }}>
+        <div className="w-full sm:w-auto sm:min-w-[200px]">
           <FormControl fullWidth variant="outlined" size="small">
-            <InputLabel id="employee-select-label">Pilih Karyawan</InputLabel>
+            <InputLabel>Pilih Karyawan</InputLabel>
             <Select
-              labelId="employee-select-label"
-              id="employee-select"
               value={selectedEmployee}
               onChange={(e) => setSelectedEmployee(e.target.value)}
               label="Pilih Karyawan"
               disabled={loadingEmployees}
             >
               <MenuItem value="">
-                {loadingEmployees ? <CircularProgress size={20} sx={{ mr: 1 }} /> : null}
-                {loadingEmployees ? 'Memuat Karyawan...' : '-- Pilih Mandor --'}
+                {loadingEmployees && <CircularProgress size={20} className="mr-2" />}
+                {loadingEmployees ? 'Memuat...' : '-- Pilih Mandor --'}
               </MenuItem>
               {employees.map(emp => (
                 <MenuItem key={emp.id} value={emp.id}>{emp.name}</MenuItem>
               ))}
             </Select>
           </FormControl>
-        </Box>
-
-        <Box sx={{
-            width: { xs: '100%', sm: '150px', md: '160px' },
-            flexShrink: 0,
-        }}>
+        </div>
+        <div className="w-full sm:w-auto sm:min-w-[160px]">
           <TextField
             fullWidth
-            id="date-picker"
             label="Pilih Tanggal"
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
+            InputLabelProps={{ shrink: true }}
             variant="outlined"
             size="small"
           />
-        </Box>
-
+        </div>
         <Button
           type="submit"
           variant="contained"
-          size="small"
           disabled={loadingHistory || loadingEmployees}
-          sx={{
-            width: { xs: '100%', sm: 'auto' },
-            minWidth: { sm: '120px' },
-            py: 0.8,
-            backgroundColor: 'primary.main',
-            '&:hover': {
-              backgroundColor: 'primary.dark',
-            },
-            alignSelf: 'flex-end',
-          }}
+          className="w-full sm:w-auto bg-green-700 hover:bg-green-800"
+          style={{ textTransform: 'none', padding: '8px 16px' }}
         >
           {loadingHistory ? 'Mencari...' : 'Tampilkan Riwayat'}
         </Button>
       </Box>
+      
+      <hr className="my-8 border-gray-200" />
 
-      <Divider sx={{ my: 4 }} />
-
-      {/* Bagian Hasil Riwayat (Peta dan Ringkasan) - Maps Dinaikkan */}
-      {/* Kita akan tetap menggunakan struktur yang sama karena terbukti menampilkan peta */}
-      <Box id="history-results" sx={{ marginTop: '20px' }}>
-        {/* Div untuk HistoryMap - Ketinggian disesuaikan */}
-        <Box sx={{
-            marginBottom: '20px',
-            // --- START: KETINGGIAN MAP DIKEMBALIKAN KE NILAI YANG LEBIH WAJAR ---
-            height: { xs: '400px', sm: '500px', md: '550px', lg: '500px' }, // Dikurangi 50-100px dari sebelumnya
-            // --- END: KETINGGIAN MAP DIKEMBALIKAN KE NILAI YANG LEBIH WAJAR ---
-            backgroundColor: '#FFFFFF',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-            overflow: 'hidden',
-        }}>
-          <HistoryMap logs={logs} geofence={geofence} />
-        </Box>
-        {/* Div untuk SummaryPanel - Ketinggian disesuaikan agar konsisten */}
-        <Box>
+      {/* Grid untuk Peta dan Ringkasan */}
+      <div id="history-results" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 h-[500px] bg-white rounded-xl shadow-lg overflow-hidden flex items-center justify-center">
+          {loadingHistory ? (
+            <CircularProgress />
+          ) : isSearched ? (
+            <HistoryMap logs={logs} geofence={geofence} />
+          ) : (
+            <div className="text-center text-gray-500">
+              <p>Peta riwayat akan muncul di sini.</p>
+            </div>
+          )}
+        </div>
+        <div className="lg:col-span-1">
           <SummaryPanel summary={summary} loading={loadingHistory} error={error} />
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+      
+      {error && (
+        <div className="p-5">
+           <Alert severity="error">Gagal memuat data. Silakan coba lagi.</Alert>
+        </div>
+      )}
+    </div>
   );
 }
 
