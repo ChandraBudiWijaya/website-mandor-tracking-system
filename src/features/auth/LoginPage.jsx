@@ -1,8 +1,8 @@
-// src/features/auth/components/LoginPage.jsx
+// src/features/auth/LoginPage.jsx
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext'; // Pastikan path ini benar
+import { useAuth } from '../../context/AuthContext';
 import {
   Button,
   TextField,
@@ -13,19 +13,12 @@ import {
   Alert,
   IconButton,
   InputAdornment,
-  useTheme // Import useTheme untuk mengakses palet warna di JSX
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import CircularProgress from '@mui/material/CircularProgress';
-
-// --- Impor style dari file terpisah ---
-// PATH PENTING: Sesuaikan path ini agar benar relatif terhadap file LoginPage.jsx
-import { loginPageStyles } from '../../style/LoginPageStyles'; 
-
-// --- (PENTING) Impor logo di sini ---
-// PATH PENTING: Sesuaikan path ini agar benar relatif terhadap file LoginPage.jsx
-import logo from '../../assets/images/wijaya.png'; 
+import logo from '../../assets/images/wijaya.png';
+import loginBackground from '../../assets/images/banana2.jpg'; // Import background image
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -34,9 +27,8 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login } = useAuth(); // Pastikan AuthContext berfungsi dengan baik
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const theme = useTheme(); // Gunakan useTheme hook untuk mengakses palet warna
 
   const handleClickShowPassword = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -60,76 +52,57 @@ function LoginPage() {
     }
   };
 
-  const handleITSupportClick = () => {
-    // Ganti email dengan alamat email IT Support yang sebenarnya
-    window.location.href = 'mailto:chandrabw.cjcc@gmail.com?subject=Lupa Password Dashboard Mandor&body=Mohon bantu reset password akun saya.';
-  };
-
   return (
-    // ThemeProvider diasumsikan sudah ada di level App.js atau index.js
-    <Box sx={loginPageStyles.mainBox}>
+    <Box
+      className="min-h-screen flex items-center justify-center bg-cover bg-center bg-fixed p-4 sm:p-6 md:p-8"
+      style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${loginBackground})` }}
+    >
       <Container
         maxWidth="lg"
-        sx={loginPageStyles.commonContainer}
+        className="flex flex-col md:flex-row items-center justify-between w-full py-8 md:py-0"
       >
-        {/* Kolom Kiri: Teks Selamat Datang / Penjelasan dengan Frosted Glass */}
-        <Box sx={loginPageStyles.leftBox}>
-          <Typography
-            variant="h3"
-            component="h1"
-            sx={{
-              fontWeight: 'inherit', // Akan mengambil fontWeight dari typography.h3 di tema
-              mb: 2,
-              lineHeight: 1.2,
-              color: 'inherit', // Akan mengambil color dari Box kiri (putih)
-            }}
-          >
+        {/* Kolom Kiri: Teks Selamat Datang */}
+        <Box
+          className="flex-1 flex flex-col justify-center text-white p-6 md:p-8 rounded-2xl shadow-lg max-w-full md:max-w-xl mb-8 md:mb-0 md:mr-6 text-center md:text-left"
+          style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(2px)', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
+        >
+         <h1 className="font-bold text-4xl mb-2 leading-tight">
             Selamat datang di Dashboard Mandor Banana Tracking
-          </Typography>
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 'inherit', // Akan mengambil fontWeight dari typography.h6 di tema
-              color: 'inherit', // Akan mengambil color dari Box kiri (putih)
-            }}
-          >
+          </h1>
+          <p className="font-light text-xl">
             Kelola dan pantau seluruh operasional perkebunan pisang Anda dengan lebih efisien dan akurat.
             Dapatkan informasi real-time dan tingkatkan produktivitas tim Anda.
-          </Typography>
+          </p>
         </Box>
 
         {/* Kolom Kanan: Card Login */}
-        <Paper elevation={12} sx={loginPageStyles.rightPaper}>
-          {/* Logo di sini */}
+        <Paper
+          elevation={12}
+          className="p-6 sm:p-8 md:p-10 flex flex-col items-center rounded-xl gap-4 w-full sm:w-4/5 md:w-auto md:max-w-sm"
+          style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
+        >
           <Box
             component="img"
             src={logo}
             alt="Wijaya Logo"
-            sx={{
-              width: { xs: '80px', sm: '100px', md: '120px' },
-              height: 'auto',
-              mb: 3,
-            }}
+            className="w-20 sm:w-24 md:w-32 h-auto mb-3"
           />
 
           <Typography
             component="h2"
             variant="h5"
-            sx={loginPageStyles.rightPaperTitle} // Style judul diambil dari objek terpisah
+            className="mb-4 font-bold text-center leading-snug text-gray-800 text-2xl"
           >
             Login ke Akun Anda
           </Typography>
 
           {error && (
-            <Alert
-              severity="error"
-              sx={{ mb: 3, width: '100%', borderRadius: '8px' }}
-            >
+            <Alert severity="error" className="mb-3 w-full rounded-lg">
               {error}
             </Alert>
           )}
 
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
+          <Box component="form" onSubmit={handleSubmit} className="mt-1 w-full">
             <TextField
               margin="normal"
               required
@@ -142,7 +115,7 @@ function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               variant="outlined"
-              // Style TextField sudah diatur di tema global (MuiTextField)
+              
             />
             <TextField
               margin="normal"
@@ -156,7 +129,6 @@ function LoginPage() {
               variant="outlined"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              // Style TextField sudah diatur di tema global
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -166,8 +138,7 @@ function LoginPage() {
                       onMouseDown={handleMouseDownPassword}
                       edge="end"
                     >
-                      {/* Warna icon sekarang diambil dari theme.palette.text.secondary */}
-                      {showPassword ? <VisibilityOff sx={{ color: theme.palette.text.secondary }} /> : <Visibility sx={{ color: theme.palette.text.secondary }} />}
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -179,49 +150,35 @@ function LoginPage() {
               fullWidth
               variant="contained"
               disabled={loading}
-              sx={{
-                mt: 4,
-                mb: 2,
-                py: 1.8,
-                fontSize: '1.3rem',
-                borderRadius: '8px',
-                // Style Button sudah diatur di tema global (MuiButton)
-                boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.4)',
-                backgroundColor: '#008641',
-                transition: 'background-color 0.3s ease-in-out, transform 0.2s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  backgroundColor: '#006f35', // Warna saat hover
-                },
+              className="mt-6 mb-2 py-4 text-xl rounded-lg shadow-lg hover:-translate-y-0.5"
+              style={{ 
+                backgroundColor: '#008641', 
+                transition: 'background-color 0.3s ease-in-out, transform 0.2s ease-in-out' 
               }}
             >
               {loading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
             </Button>
 
-            <Box sx={{ width: '100%', textAlign: 'center', mt: 2 }}>
-              <Typography
-              variant="body2"
-              sx={loginPageStyles.linkTextSecondary} // Style dari objek terpisah
-            >
-              Lupa Password ?{' '}
-              <Typography
-                component="span"
-                variant="body2"
-                sx={loginPageStyles.linkPrimary} // Style dari objek terpisah
-                // Mengganti onClick={() => navigate('')} dengan fungsi handleITSupportClick
-                onClick={handleITSupportClick} // <-- Panggil fungsi ini
-              >
-                Admin IT Support
+            <Box className="w-full text-center mt-2">
+              <Typography variant="body2" className="text-gray-600 font-medium">
+                Lupa password?{' '}
+                <a
+                  href="mailto:chandrabw.cjcc@gmail.com"
+                  className="text-green-700 font-bold cursor-pointer hover:underline"
+                >
+                  Hubungi Admin IT
+                </a>
               </Typography>
-            </Typography>
             </Box>
           </Box>
         </Paper>
       </Container>
+      
       {/* Watermark */}
       <Typography
         variant="caption"
-        sx={loginPageStyles.watermark} // Style dari objek terpisah
+        className="absolute bottom-4 right-4 text-white opacity-90 font-medium"
+        style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.7)' }}
       >
         by Chandra Budi Wijaya - 122140093
       </Typography>
