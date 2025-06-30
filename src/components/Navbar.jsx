@@ -3,7 +3,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import appLogo from '../assets/images/wijaya.png';
+import appLogo from '../assets/images/GGF.svg';
 
 const Navbar = () => {
   const { currentUser, logout } = useAuth();
@@ -23,7 +23,7 @@ const Navbar = () => {
     <header className="flex items-center justify-between px-6 h-[64px] bg-white shadow-md sticky top-0 z-50">
       {/* Bagian Kiri: Logo dan Judul */}
       <div className="flex items-center gap-2.5">
-        <img src={appLogo} alt="Mandor Tracking Logo" className="h-[55px] w-auto" />
+        <img src={appLogo} alt="Mandor Tracking Logo" className="h-[88px] w-auto" />
         <h1 className="text-2xl font-semibold text-gray-800 -tracking-wide">
           Mandor Banana Tracking
         </h1>

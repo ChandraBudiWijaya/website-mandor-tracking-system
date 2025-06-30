@@ -47,7 +47,7 @@ const AppSidebar = () => {
               borderRadius: '8px',
               fontWeight: active ? '600' : '500',
               padding: level === 1 ? '10px 20px 10px 30px' : '12px 20px',
-              transition: 'all 0.2s ease',
+               transition: 'background-color 0.2s ease, color 0.2s ease',
               '&:hover': {
                 backgroundColor: active ? '#f2f2f2' : colors.hoverBg,
                 color: active ? colors.activeText : '#fffff9',
