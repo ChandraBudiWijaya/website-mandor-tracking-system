@@ -35,6 +35,18 @@ const HistoryMap = ({ logs, geofence }) => {
   const geofencePath = geofence ? geofence.coordinates.map(coord => [coord.lat, coord.lng]) : null;
   const geofenceOptions = { color: 'green', fillColor: 'lightgreen', fillOpacity: 0.4 };
 
+  const formatTimestamp = (timestamp) => {
+      if (!timestamp || !timestamp.toDate) return 'N/A';
+      return timestamp.toDate().toLocaleString('id-ID', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    };
+
   // Jika tidak ada data, tampilkan pesan di dalam container peta
   if (!hasData) {
     return (
@@ -67,13 +79,23 @@ const HistoryMap = ({ logs, geofence }) => {
         
         {startPoint && (
           <Marker position={[startPoint.lat, startPoint.lng]} icon={DefaultIcon}>
-            <Popup>Titik Awal<br/>{startPoint.timestamp.toDate().toLocaleTimeString('id-ID')}</Popup>
+            <Popup>
+              <b>Titik Awal</b><br />
+              Waktu: {formatTimestamp(startPoint.device_timestamp)}<br/>
+              Lat: {startPoint.lat.toFixed(6)}<br/>
+              Lng: {startPoint.lng.toFixed(6)}
+            </Popup>
           </Marker>
         )}
 
         {endPoint && (
-            <Marker position={[endPoint.lat, endPoint.lng]} icon={DefaultIcon}>
-            <Popup>Titik Akhir<br/>{endPoint.timestamp.toDate().toLocaleTimeString('id-ID')}</Popup>
+          <Marker position={[endPoint.lat, endPoint.lng]} icon={DefaultIcon}>
+            <Popup>
+              <b>Titik Akhir</b><br />
+              Waktu: {formatTimestamp(endPoint.device_timestamp)}<br/>
+              Lat: {endPoint.lat.toFixed(6)}<br/>
+              Lng: {endPoint.lng.toFixed(6)}
+            </Popup>
           </Marker>
         )}
 

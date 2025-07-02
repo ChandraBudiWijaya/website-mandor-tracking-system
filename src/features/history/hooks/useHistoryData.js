@@ -1,11 +1,13 @@
+// src/features/history/hooks/useHistoryData.js
+
 import { useState } from 'react';
 import { db } from '../../../api/firebaseConfig';
 import { collection, query, where, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
 
 export const useHistoryData = () => {
-  const [logs, setLogs] = useState([]);
+  const [logs, setLogs] = useState([]); // Pastikan state awal adalah array kosong
   const [summary, setSummary] = useState(null);
-  const [geofence, setGeofence] = useState(null); // <-- 1. Tambah state baru untuk geofence
+  const [geofence, setGeofence] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -14,24 +16,22 @@ export const useHistoryData = () => {
     setError(null);
     setLogs([]);
     setSummary(null);
-    setGeofence(null); // <-- Reset geofence saat pencarian baru
+    setGeofence(null);
 
     try {
-      // --- Ambil Tracking Logs (Tidak berubah) ---
-      const startOfDay = new Date(`${date}T00:00:00`);
-      const endOfDay = new Date(`${date}T23:59:59`);
+      // --- [PERUBAHAN UTAMA] Mengambil data dari sub-koleksi ---
+      // employees/{employeeId}/logs_{date
+      const logsCollectionPath = `employees/${employeeId}/logs_${date}`;
       const logsQuery = query(
-        collection(db, 'tracking_logs'),
-        where('index_karyawan', '==', employeeId),
-        where('timestamp', '>=', startOfDay),
-        where('timestamp', '<=', endOfDay),
-        orderBy('timestamp', 'asc')
+        collection(db, logsCollectionPath),
+        orderBy('device_timestamp', 'asc') // Sesuaikan nama field timestamp jika perlu
       );
+      
       const logsSnapshot = await getDocs(logsQuery);
       const logsData = logsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setLogs(logsData);
 
-      // --- Ambil Daily Summary (Tidak berubah) ---
+      // --- Logika untuk summary dan geofence (mungkin juga perlu disesuaikan) ---
       const summaryDocId = `${employeeId}_${date}`;
       const summaryDocRef = doc(db, 'daily_summaries', summaryDocId);
       const summarySnapshot = await getDoc(summaryDocRef);
@@ -39,27 +39,25 @@ export const useHistoryData = () => {
         setSummary(summarySnapshot.data());
       }
 
-      // --- 2. LOGIKA BARU: Ambil Geofence ---
       const geofencesQuery = query(
         collection(db, 'geofences'),
         where('assignedTo', '==', employeeId)
       );
       const geofenceSnapshot = await getDocs(geofencesQuery);
       if (!geofenceSnapshot.empty) {
-        // Kita asumsikan satu karyawan hanya punya satu geofence utama
-        // Jika bisa punya banyak, logikanya perlu disesuaikan
         const geofenceData = geofenceSnapshot.docs[0].data();
         setGeofence(geofenceData);
       }
 
     } catch (err) {
       console.error("Error fetching history data:", err);
+      // Jika terjadi error (misalnya koleksi tidak ditemukan), pastikan logs tetap array
+      setLogs([]); 
       setError(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // 3. Kembalikan geofence dari hook
   return { logs, summary, geofence, loading, error, fetchData };
 };

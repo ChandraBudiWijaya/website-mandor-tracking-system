@@ -21,13 +21,11 @@ import {
 function HistoryPage() {
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
-  const [isSearched, setIsSearched] = useState(false);
   const { employees, loading: loadingEmployees } = useEmployees();
   const { logs, summary, geofence, loading: loadingHistory, error, fetchData } = useHistoryData();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsSearched(true);
     if (!selectedEmployee || !selectedDate) {
       alert('Silakan pilih karyawan dan tanggal terlebih dahulu.');
       return;
@@ -41,7 +39,6 @@ function HistoryPage() {
         Riwayat Perjalanan
       </Typography>
 
-      {/* Form Pencarian */}
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -91,17 +88,14 @@ function HistoryPage() {
       
       <hr className="my-8 border-gray-200" />
 
-      {/* Grid untuk Peta dan Ringkasan */}
+      {/* --- [PERBAIKAN DI SINI] --- */}
+      {/* Logika render diubah agar lebih sederhana dan andal */}
       <div id="history-results" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 h-[500px] bg-white rounded-xl shadow-lg overflow-hidden flex items-center justify-center">
           {loadingHistory ? (
             <CircularProgress />
-          ) : isSearched ? (
-            <HistoryMap logs={logs} geofence={geofence} />
           ) : (
-            <div className="text-center text-gray-500">
-              <p>Peta riwayat akan muncul di sini.</p>
-            </div>
+            <HistoryMap logs={logs} geofence={geofence} />
           )}
         </div>
         <div className="lg:col-span-1">
@@ -110,7 +104,7 @@ function HistoryPage() {
       </div>
       
       {error && (
-        <div className="p-5">
+        <div className="p-5 mt-4">
            <Alert severity="error">Gagal memuat data. Silakan coba lagi.</Alert>
         </div>
       )}
