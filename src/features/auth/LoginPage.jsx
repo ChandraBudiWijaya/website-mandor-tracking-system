@@ -50,7 +50,7 @@ function LoginPage() {
       <div 
         className="hidden lg:flex lg:col-span-3 flex-col justify-center items-start p-12 text-white bg-cover bg-center"
         style={{
-          backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${loginBackground})`,
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url(${loginBackground})`,
           backdropFilter: 'blur(1px)', // Efek frosted glass, sesuaikan nilai blur jika perlu
           WebkitBackdropFilter: 'blur(2px)' // Untuk kompatibilitas browser
         }}
