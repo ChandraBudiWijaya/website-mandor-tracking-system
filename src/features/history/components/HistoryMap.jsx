@@ -11,8 +11,18 @@ let DefaultIcon = L.icon({
     popupAnchor: [1, -34],
 });
 
-function HistoryMapEffect({ path, geofencePath }) {
+const createMovingIcon = () => {
+  return L.divIcon({
+    html: `<div style="background-color: #1e8e3e; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.7);"></div>`,
+    className: '',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
+};
+
+function HistoryMapEffect({ path, geofencePath, currentMarker }) {
     const map = useMap();
+
     useEffect(() => {
         if (path && path.length > 1) {
             map.fitBounds(path, { padding: [50, 50], maxZoom: 17 });
@@ -20,46 +30,39 @@ function HistoryMapEffect({ path, geofencePath }) {
         else if (geofencePath && geofencePath.length > 0) {
             map.fitBounds(geofencePath, { padding: [50, 50], maxZoom: 17 });
         }
-    }, [path, geofencePath, map]);
+    }, [path, geofencePath]);
+
+    useEffect(() => {
+        if (currentMarker) {
+            map.panTo([currentMarker.lat, currentMarker.lng]);
+        }
+    }, [currentMarker]);
 
     return null;
 }
 
-const HistoryMap = ({ logs, geofence }) => {
-  const pathCoordinates = logs ? logs.map(log => [log.lat, log.lng]) : [];
-  const hasData = logs && logs.length > 0;
+const HistoryMap = ({ logs, geofence, currentMarker }) => {
+  const safeLogs = Array.isArray(logs) ? logs : [];
+  const pathCoordinates = safeLogs.map(log => [log.lat, log.lng]);
+  const hasData = safeLogs.length > 0;
   
-  const startPoint = hasData ? logs[0] : null;
-  const endPoint = hasData ? logs[logs.length - 1] : null;
+  const startPoint = hasData ? safeLogs[0] : null;
+  const endPoint = hasData ? safeLogs[safeLogs.length - 1] : null;
 
   const geofencePath = geofence ? geofence.coordinates.map(coord => [coord.lat, coord.lng]) : null;
   const geofenceOptions = { color: 'green', fillColor: 'lightgreen', fillOpacity: 0.4 };
 
   const formatTimestamp = (timestamp) => {
-      if (!timestamp || !timestamp.toDate) return 'N/A';
-      return timestamp.toDate().toLocaleString('id-ID', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
-    };
-
-  // Jika tidak ada data, tampilkan pesan di dalam container peta
-  if (!hasData) {
-    return (
-      <div className="h-full w-full flex items-center justify-center bg-gray-100">
-        <p className="text-gray-500">Tidak ada data perjalanan untuk ditampilkan.</p>
-      </div>
-    );
-  }
+    if (!timestamp || !timestamp.toDate) return 'N/A';
+    return timestamp.toDate().toLocaleString('id-ID', {
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+  };
 
   return (
     <div className="h-full w-full">
       <MapContainer 
-        key={pathCoordinates.length} // Key untuk me-reset peta saat data baru dimuat
+        key={geofencePath ? geofencePath.toString() : pathCoordinates.toString()} // Reset peta saat data utama berubah
         center={[-4.5586, 105.4068]} 
         zoom={9} 
         className="h-full w-full"
@@ -75,31 +78,44 @@ const HistoryMap = ({ logs, geofence }) => {
 
         {geofencePath && <Polygon pathOptions={geofenceOptions} positions={geofencePath} />}
 
-        <Polyline pathOptions={{ color: 'blue', weight: 5, opacity: 0.7 }} positions={pathCoordinates} />
-        
-        {startPoint && (
-          <Marker position={[startPoint.lat, startPoint.lng]} icon={DefaultIcon}>
-            <Popup>
-              <b>Titik Awal</b><br />
-              Waktu: {formatTimestamp(startPoint.device_timestamp)}<br/>
-              Lat: {startPoint.lat.toFixed(6)}<br/>
-              Lng: {startPoint.lng.toFixed(6)}
-            </Popup>
-          </Marker>
+        {!hasData ? (
+          <div className="flex items-center justify-center h-full w-full">
+            <p className="text-gray-500 bg-white p-4 rounded-lg shadow-md z-[1000] relative">
+              Data perjalanan akan muncul di sini.
+            </p>
+          </div>
+        ) : (
+          <>
+            <Polyline pathOptions={{ color: 'blue', weight: 5, opacity: 0.7 }} positions={pathCoordinates} />
+            
+            {startPoint && (
+              <Marker position={[startPoint.lat, startPoint.lng]} icon={DefaultIcon}>
+                <Popup><b>Titik Awal</b><br/>Waktu: {formatTimestamp(startPoint.device_timestamp)}</Popup>
+              </Marker>
+            )}
+
+            {!currentMarker && endPoint && (
+               <Marker position={[endPoint.lat, endPoint.lng]} icon={DefaultIcon}>
+                <Popup><b>Titik Akhir</b><br/>Waktu: {formatTimestamp(endPoint.device_timestamp)}</Popup>
+              </Marker>
+            )}
+
+            {currentMarker && (
+              <Marker 
+                position={[currentMarker.lat, currentMarker.lng]}
+                icon={createMovingIcon()}
+                zIndexOffset={1000}
+              >
+                <Popup>
+                  <b>Posisi Saat Ini</b><br/>
+                  Waktu: {formatTimestamp(currentMarker.device_timestamp)}
+                </Popup>
+              </Marker>
+            )}
+          </>
         )}
 
-        {endPoint && (
-          <Marker position={[endPoint.lat, endPoint.lng]} icon={DefaultIcon}>
-            <Popup>
-              <b>Titik Akhir</b><br />
-              Waktu: {formatTimestamp(endPoint.device_timestamp)}<br/>
-              Lat: {endPoint.lat.toFixed(6)}<br/>
-              Lng: {endPoint.lng.toFixed(6)}
-            </Popup>
-          </Marker>
-        )}
-
-        <HistoryMapEffect path={pathCoordinates} geofencePath={geofencePath} />
+        <HistoryMapEffect path={pathCoordinates} geofencePath={geofencePath} currentMarker={currentMarker} />
       </MapContainer>
     </div>
   );
