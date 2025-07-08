@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// src/features/management/GeofenceManagementPage.jsx
+
+import React, { useState, useMemo } from 'react';
 import { useGeofences } from '../../hooks/useGeofences';
 import GeofenceFormModal from './components/GeofenceFormModal';
 import { db } from '../../api/firebaseConfig';
@@ -6,23 +8,17 @@ import { doc, setDoc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
 // Import komponen MUI
 import {
-  Typography,
   Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   IconButton,
   Alert,
-  Box, // Impor Box untuk layouting
-  CircularProgress // Impor CircularProgress
+  Box,
+  CircularProgress,
+  TextField,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
 
 function GeofenceManagementPage() {
     const { geofences, loading, setGeofences } = useGeofences();
@@ -30,7 +26,20 @@ function GeofenceManagementPage() {
     const [editingGeofence, setEditingGeofence] = useState(null);
     const [pageError, setPageError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const [isSaving, setIsSaving] = useState(false); // State untuk loading saat menyimpan
+    const [isSaving, setIsSaving] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredGeofences = useMemo(() => {
+        if (!searchTerm) {
+            return geofences;
+        }
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+        return geofences.filter(geo =>
+            geo.id.toLowerCase().includes(lowerCaseSearchTerm) ||
+            geo.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+            (geo.assignedTo && geo.assignedTo.toLowerCase().includes(lowerCaseSearchTerm))
+        );
+    }, [geofences, searchTerm]);
 
     const handleOpenAddModal = () => {
         setEditingGeofence(null);
@@ -51,17 +60,16 @@ function GeofenceManagementPage() {
         const { id, ...data } = geofenceData;
         setPageError('');
         setSuccessMessage('');
-        setIsSaving(true); // Mulai loading
+        setIsSaving(true);
 
         if (!id) {
             setPageError("ID Area tidak boleh kosong!");
-            setIsSaving(false); // Hentikan loading jika ada error validasi
+            setIsSaving(false);
             return;
         }
 
         try {
             const geofenceRef = doc(db, "geofences", id);
-
             if (editingGeofence) {
                 await updateDoc(geofenceRef, data);
                 setGeofences(prev => prev.map(g => g.id === id ? { id, ...data } : g));
@@ -70,7 +78,7 @@ function GeofenceManagementPage() {
                 const docSnap = await getDoc(geofenceRef);
                 if (docSnap.exists()) {
                     setPageError(`Error: Area dengan ID "${id}" sudah ada!`);
-                    setIsSaving(false); // Hentikan loading
+                    setIsSaving(false);
                     return;
                 }
                 await setDoc(geofenceRef, data);
@@ -79,10 +87,9 @@ function GeofenceManagementPage() {
             }
             handleCloseModal();
         } catch (e) {
-            console.error("Error saving geofence: ", e);
             setPageError("Gagal menyimpan area kerja! " + e.message);
         } finally {
-            setIsSaving(false); // Selalu hentikan loading di akhir
+            setIsSaving(false);
         }
     };
 
@@ -95,31 +102,42 @@ function GeofenceManagementPage() {
                 setGeofences(prev => prev.filter(g => g.id !== geofenceId));
                 setSuccessMessage(`Area kerja dengan ID "${geofenceId}" berhasil dihapus.`);
             } catch (e) {
-                console.error("Error deleting geofence: ", e);
                 setPageError("Gagal menghapus area kerja! " + e.message);
             }
         }
     };
     
     return (
-        <div className="p-5 bg-gray-50 min-h-[calc(100vh-70px)]">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+        <div className="p-5 bg-gray-100 dark:bg-gray-900 min-h-[calc(100vh-70px)] transition-colors duration-300">
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                 Manajemen Area Kerja (Geofence)
             </h1>
-            <p className="mb-6 text-gray-600">
+            <p className="mb-6 text-gray-600 dark:text-gray-400">
                 Di halaman ini Anda bisa menambah, mengubah, dan menghapus data area kerja.
             </p>
             
-            <div className="mb-5">
+            <div className="mb-5 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <Button
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={handleOpenAddModal}
                     className="w-full sm:w-auto bg-green-700 hover:bg-green-800"
-                    style={{ textTransform: 'none', padding: '8px 16px', borderRadius: '8px' }}
                 >
                     Tambah Area Baru
                 </Button>
+                <div className="w-full sm:w-auto">
+                  <TextField
+                    placeholder="Cari area kerja..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <SearchIcon sx={{ color: 'action.active', mr: 1 }} />
+                      ),
+                    }}
+                    className="w-full sm:w-64 md:w-72"
+                  />
+                </div>
             </div>
 
             {successMessage && <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccessMessage('')}>{successMessage}</Alert>}
@@ -133,44 +151,43 @@ function GeofenceManagementPage() {
                 isSaving={isSaving}
             />
             
-            {/* --- [PERBAIKAN DI SINI] --- */}
             {loading ? (
                 <Box className="flex justify-center items-center h-64">
                     <CircularProgress />
-                    <Typography className="ml-4 text-gray-600">Memuat data area kerja...</Typography>
+                    <p className="ml-4 text-gray-600 dark:text-gray-400">Memuat data area kerja...</p>
                 </Box>
             ) : (
-                <TableContainer component={Paper} elevation={4} className="rounded-xl">
-                    <Table>
-                        <TableHead className="bg-gray-50">  
-                            <TableRow>
-                                <TableCell className="font-bold text-gray-600">ID Area</TableCell>
-                                <TableCell className="font-bold text-gray-600">Nama Area</TableCell>
-                                <TableCell className="font-bold text-gray-600">Ditugaskan ke (ID)</TableCell>
-                                <TableCell className="font-bold text-gray-600">Jumlah Titik</TableCell>
-                                <TableCell className="font-bold text-gray-600 text-center">Aksi</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {geofences.map(geo => (
-                                <TableRow key={geo.id} className="hover:bg-gray-50">
-                                    <TableCell>{geo.id}</TableCell>
-                                    <TableCell>{geo.name}</TableCell>
-                                    <TableCell>{geo.assignedTo}</TableCell>
-                                    <TableCell>{geo.coordinates ? geo.coordinates.length : 0} Titik</TableCell>
-                                    <TableCell className="text-center">
-                                        <IconButton size="small" onClick={() => handleOpenEditModal(geo)} sx={{ color: 'primary.main' }}>
+                <div className="shadow-lg rounded-xl overflow-hidden bg-white dark:bg-gray-800">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead className="bg-gray-50 dark:bg-gray-700">  
+                            <tr>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID Area</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama Area</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ditugaskan ke (ID)</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Jumlah Titik</th>
+                                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            {filteredGeofences.map(geo => (
+                                <tr key={geo.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{geo.id}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{geo.name}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{geo.assignedTo}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{geo.coordinates ? geo.coordinates.length : 0} Titik</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                        <IconButton size="small" onClick={() => handleOpenEditModal(geo)} sx={{ color: 'primary.main', mr: 1 }}>
                                             <EditIcon fontSize="small" />
                                         </IconButton>
                                         <IconButton size="small" onClick={() => handleDeleteGeofence(geo.id)} sx={{ color: 'error.main' }}>
                                             <DeleteIcon fontSize="small" />
                                         </IconButton>
-                                    </TableCell>
-                                </TableRow>
+                                    </td>
+                                </tr>
                             ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                        </tbody>
+                    </table>
+                </div>
             )}
         </div>
     );

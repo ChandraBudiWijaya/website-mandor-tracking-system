@@ -17,7 +17,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  CircularProgress // <-- Pastikan CircularProgress diimpor
+  CircularProgress
 } from '@mui/material';
 
 let DefaultIcon = L.icon({
@@ -26,7 +26,6 @@ let DefaultIcon = L.icon({
     iconAnchor: [12, 41]
 });
 L.Marker.prototype.options.icon = DefaultIcon;
-
 
 const GeofenceFormModal = ({ isOpen, onClose, onSave, initialData, isSaving }) => {
     const featureGroupRef = useRef();
@@ -58,32 +57,29 @@ const GeofenceFormModal = ({ isOpen, onClose, onSave, initialData, isSaving }) =
         const bounds = initialCoords.map(c => [c.lat, c.lng]);
         mapProps = { bounds, boundsOptions: { padding: [50, 50] } };
     } else {
-        mapProps = { center: [-4.5586, 105.4068], zoom: 9 };
+        mapProps = { center: [-4.818, 105.187], zoom: 13 };
     }
 
-    const handleShapeChange = (e) => {
-        const layer = e.layers.getLayers()[0];
-        if (!layer) {
-            setEditedShape(null);
-            return;
-        }
-        const latlngs = layer.getLatLngs();
-        const layerType = layer instanceof L.Polygon ? 'polygon' : 'polyline';
-        const coords = layerType === 'polygon' 
-            ? latlngs[0].map(latlng => ({ lat: latlng.lat, lng: latlng.lng }))
-            : latlngs.map(latlng => ({ lat: latlng.lat, lng: latlng.lng }));
-        setEditedShape({ type: layerType, coordinates: coords });
+    const handleShapeEdited = (e) => {
+        e.layers.eachLayer(layer => {
+             if (layer) {
+                const latlngs = layer.getLatLngs();
+                const layerType = layer instanceof L.Polygon ? 'polygon' : 'polyline';
+                const coords = layerType === 'polygon' 
+                    ? latlngs[0].map(latlng => ({ lat: latlng.lat, lng: latlng.lng }))
+                    : latlngs.map(latlng => ({ lat: latlng.lat, lng: latlng.lng }));
+                setEditedShape({ type: layerType, coordinates: coords });
+             }
+        });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const finalShape = editedShape || (initialData ? { type: initialData.type, coordinates: initialData.coordinates } : null);
-
         if (!finalShape || !finalShape.coordinates || finalShape.coordinates.length < 2) {
             alert("Harap gambar atau edit sebuah area di peta terlebih dahulu.");
             return;
         }
-        
         const geofenceData = {
           id: isEditMode ? initialData.id : id,
           name: name,
@@ -104,8 +100,7 @@ const GeofenceFormModal = ({ isOpen, onClose, onSave, initialData, isSaving }) =
             </DialogTitle>
             <DialogContent>
                 <form id="geofence-form" onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-6 mt-4">
-                    {/* Kolom Kiri: Peta */}
-                    <div className="lg:w-2/3 h-[400px] lg:h-[500px] border rounded-lg overflow-hidden">
+                    <div className="lg:w-2/3 h-[400px] lg:h-[500px] border dark:border-gray-600 rounded-lg overflow-hidden">
                         <MapContainer key={initialData?.id || 'new'} {...mapProps} style={{ height: '100%', width: '100%' }}>
                             <LayersControl position="topright">
                                 <LayersControl.BaseLayer checked name="Street Map">
@@ -118,8 +113,8 @@ const GeofenceFormModal = ({ isOpen, onClose, onSave, initialData, isSaving }) =
                             <FeatureGroup ref={featureGroupRef}>
                                 <EditControl
                                     position="topright"
-                                    onCreated={handleShapeChange}
-                                    onEdited={handleShapeChange}
+                                    onCreated={handleShapeEdited}
+                                    onEdited={handleShapeEdited}
                                     onDeleted={() => setEditedShape(null)}
                                     draw={{ polygon: true, polyline: true, rectangle: false, circle: false, circlemarker: false, marker: false }}
                                 />
@@ -128,24 +123,10 @@ const GeofenceFormModal = ({ isOpen, onClose, onSave, initialData, isSaving }) =
                             </FeatureGroup>
                         </MapContainer>
                     </div>
-                    {/* Kolom Kanan: Form Input */}
                     <div className="lg:w-1/3 flex flex-col gap-4">
-                       <p className="text-sm text-gray-600">Gambar atau edit area di peta, lalu isi detail di bawah ini.</p>
-                       <TextField
-                            label="ID Area"
-                            value={id}
-                            onChange={(e) => setId(e.target.value)}
-                            disabled={isEditMode}
-                            required
-                            fullWidth
-                        />
-                        <TextField
-                            label="Nama Area"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                            fullWidth
-                        />
+                       <p className="text-sm text-gray-600 dark:text-gray-400">Gambar atau edit area di peta, lalu isi detail di bawah ini.</p>
+                       <TextField label="ID Area" value={id} onChange={(e) => setId(e.target.value)} disabled={isEditMode} required fullWidth />
+                        <TextField label="Nama Area" value={name} onChange={(e) => setName(e.target.value)} required fullWidth />
                         <FormControl fullWidth>
                             <InputLabel>Tugaskan ke Karyawan</InputLabel>
                             <Select
@@ -154,7 +135,6 @@ const GeofenceFormModal = ({ isOpen, onClose, onSave, initialData, isSaving }) =
                                 onChange={(e) => setAssignedTo(e.target.value)}
                                 required
                             >
-                                {/* [PERBAIKAN DI SINI] */}
                                 <MenuItem value="" disabled={loadingEmployees}>
                                     {loadingEmployees ? <CircularProgress size={20} sx={{ marginRight: 1 }} /> : null}
                                     {loadingEmployees ? 'Memuat Karyawan...' : '-- Pilih Mandor --'}
@@ -167,7 +147,7 @@ const GeofenceFormModal = ({ isOpen, onClose, onSave, initialData, isSaving }) =
                     </div>
                 </form>
             </DialogContent>
-            <DialogActions className="p-4 bg-gray-50">
+            <DialogActions className="p-4 bg-gray-50 dark:bg-gray-800">
                 <Button onClick={onClose} variant="outlined" disabled={isSaving}>Batal</Button>
                 <Button 
                     type="submit" 

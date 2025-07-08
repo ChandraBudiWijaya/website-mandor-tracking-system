@@ -1,20 +1,29 @@
+// src/index.js
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext'; // <-- 1. IMPORT
 
+// [PERUBAHAN] Impor AppThemeProvider
+import { AppThemeProvider } from './context/ThemeContext'; 
+
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw/dist/leaflet.draw.css';
+import './index.css';
+
+import App from './App';
+import { AuthProvider } from './context/AuthContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    {/* 2. BUNGKUS SEMUANYA DENGAN AUTHPROVIDER */}
-    <AuthProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </AuthProvider>
+    {/* [PERUBAHAN] Bungkus semuanya dengan AppThemeProvider */}
+    <AppThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </AuthProvider>
+    </AppThemeProvider>
   </React.StrictMode>
 );
-

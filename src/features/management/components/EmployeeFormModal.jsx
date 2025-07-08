@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
+  DialogContent,
   TextField,
   Button,
+  CircularProgress
 } from '@mui/material';
 
-const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData }) => {
+const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData, isSaving }) => {
   const isEditMode = Boolean(initialData);
 
   const [id, setId] = useState('');
@@ -47,20 +49,20 @@ const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData }) => {
       open={isOpen}
       onClose={onClose}
       PaperProps={{
-        // Menggunakan className untuk styling utama modal
-        className: "rounded-xl shadow-xl w-full max-w-md m-4"
+        // Paper akan otomatis di-styling oleh tema MUI
+        className: "w-full max-w-md m-4"
       }}
     >
       <form onSubmit={handleSubmit}>
         {/* Header Modal */}
-        <div className="text-center p-5 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
+        <div className="text-center p-5 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {isEditMode ? 'Edit Data Karyawan' : 'Tambah Karyawan Baru'}
           </h2>
         </div>
 
         {/* Konten Form */}
-        <div className="p-6 space-y-4">
+        <DialogContent className="p-6 space-y-4">
           <TextField
             label="ID Karyawan"
             value={id}
@@ -68,8 +70,6 @@ const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData }) => {
             disabled={isEditMode}
             required
             fullWidth
-            variant="outlined"
-            size="small"
           />
           <TextField
             label="Nama Lengkap"
@@ -77,8 +77,6 @@ const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData }) => {
             onChange={(e) => setName(e.target.value)}
             required
             fullWidth
-            variant="outlined"
-            size="small"
           />
           <TextField
             label="Posisi / Jabatan"
@@ -86,8 +84,6 @@ const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData }) => {
             onChange={(e) => setPosition(e.target.value)}
             required
             fullWidth
-            variant="outlined"
-            size="small"
           />
           <TextField
             label="Nomor Telepon"
@@ -95,29 +91,22 @@ const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData }) => {
             onChange={(e) => setPhone(e.target.value)}
             required
             fullWidth
-            variant="outlined"
-            size="small"
             type="tel"
           />
-        </div>
+        </DialogContent>
 
         {/* Footer dengan Tombol Aksi */}
-        <div className="flex justify-end items-center gap-2 p-4 bg-gray-50 border-t border-gray-200">
-          <Button
-            onClick={onClose}
-            variant="text"
-            className="text-gray-600 hover:bg-gray-200"
-            style={{ textTransform: 'none', borderRadius: '8px' }}
-          >
+        <div className="flex justify-end items-center gap-2 p-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+          <Button onClick={onClose} variant="outlined" disabled={isSaving}>
             Batal
           </Button>
           <Button
             type="submit"
             variant="contained"
-            className="bg-blue-600 hover:bg-blue-700 shadow-sm"
-            style={{ textTransform: 'none', borderRadius: '8px' }}
+            disabled={isSaving}
+            className="bg-green-600 hover:bg-green-700"
           >
-            Simpan
+            {isSaving ? <CircularProgress size={24} color="inherit" /> : 'Simpan'}
           </Button>
         </div>
       </form>

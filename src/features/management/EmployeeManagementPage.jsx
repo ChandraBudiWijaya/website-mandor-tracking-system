@@ -6,16 +6,10 @@ import EmployeeFormModal from './components/EmployeeFormModal';
 import { db } from '../../api/firebaseConfig';
 import { doc, deleteDoc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 
-// Komponen MUI yang masih kita gunakan untuk fungsionalitas
-import {
-  Button,
-  CircularProgress,
-  Alert,
-  IconButton,
-  TextField,
-} from '@mui/material';
+// MUI Components
+import { Button, CircularProgress, Alert, IconButton, TextField, Box } from '@mui/material';
 
-// Ikon
+// Icons
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -71,7 +65,6 @@ function EmployeeManagementPage() {
         setSuccessMessage(`Data karyawan "${employeeData.name}" berhasil diupdate pada ${timestamp}`);
         handleCloseModal();
       } catch (e) {
-        console.error("Error updating document: ", e);
         setPageError("Gagal mengupdate karyawan! " + e.message);
       }
     } else {
@@ -87,7 +80,6 @@ function EmployeeManagementPage() {
         setSuccessMessage(`Karyawan baru "${employeeData.name}" berhasil ditambahkan pada ${timestamp}`);
         handleCloseModal();
       } catch (e) {
-        console.error("Error adding document: ", e);
         setPageError("Gagal menambahkan karyawan! " + e.message);
       }
     }
@@ -103,36 +95,31 @@ function EmployeeManagementPage() {
         const timestamp = new Date().toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
         setSuccessMessage(`Karyawan dengan ID "${employeeId}" berhasil dihapus pada ${timestamp}`);
       } catch (e) {
-        console.error("Error deleting document: ", e);
         setPageError("Gagal menghapus karyawan! " + e.message);
       }
     }
   };
 
   return (
-    <div className="p-5 bg-gray-50 min-h-[calc(100vh-70px)]">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">
+    <div className="p-5 bg-gray-100 dark:bg-gray-900 min-h-[calc(100vh-70px)] transition-colors duration-300">
+      <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
         Manajemen Karyawan
       </h1>
-      <p className="mb-6 text-gray-600">
+      <p className="mb-6 text-gray-600 dark:text-gray-400">
         Di halaman ini Anda bisa menambah, mengubah, dan menghapus data karyawan.
       </p>
 
-      {/* Kontrol di atas tabel */}
       <div className="mb-5 flex flex-col sm:flex-row justify-between items-center gap-4">
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleOpenAddModal}
           className="w-full sm:w-auto bg-green-700 hover:bg-green-800"
-          style={{ textTransform: 'none', padding: '8px 16px', borderRadius: '8px' }}
         >
           Tambah Karyawan Baru
         </Button>
         <div className="w-full sm:w-auto">
           <TextField
-            variant="outlined"
-            size="small"
             placeholder="Cari karyawan..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -157,49 +144,36 @@ function EmployeeManagementPage() {
         </Alert>
       )}
 
-      {loading && (
-        <div className="flex justify-center items-center h-48">
+      {loading ? (
+        <Box className="flex justify-center items-center h-64">
           <CircularProgress />
-          <p className="ml-3 text-lg text-gray-600">Memuat data karyawan...</p>
-        </div>
-      )}
-
-      {/* Tabel Karyawan dengan Tailwind */}
-      {!loading && (
-        <div className="shadow-lg rounded-xl overflow-hidden bg-white">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <p className="ml-4 text-gray-600 dark:text-gray-400">Memuat data karyawan...</p>
+        </Box>
+      ) : (
+        <div className="shadow-lg rounded-xl overflow-hidden bg-white dark:bg-gray-800">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Karyawan</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posisi</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telepon</th>
-                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID Karyawan</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Posisi</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Telepon</th>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredEmployees.length > 0 ? (
                 filteredEmployees.map(emp => (
-                  <tr key={emp.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{emp.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{emp.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{emp.position}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{emp.phone}</td>
+                  <tr key={emp.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{emp.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{emp.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{emp.position}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{emp.phone}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                      <IconButton
-                        aria-label="edit"
-                        size="small"
-                        onClick={() => handleOpenEditModal(emp)}
-                        sx={{ color: 'primary.main', mr: 1 }}
-                      >
+                      <IconButton aria-label="edit" size="small" onClick={() => handleOpenEditModal(emp)} sx={{ color: 'primary.main', mr: 1 }}>
                         <EditIcon fontSize="small" />
                       </IconButton>
-                      <IconButton
-                        aria-label="delete"
-                        size="small"
-                        onClick={() => handleDeleteEmployee(emp.id)}
-                        sx={{ color: 'error.main' }}
-                      >
+                      <IconButton aria-label="delete" size="small" onClick={() => handleDeleteEmployee(emp.id)} sx={{ color: 'error.main' }}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </td>
@@ -207,7 +181,7 @@ function EmployeeManagementPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
+                  <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
                     {searchTerm ? 'Tidak ada karyawan ditemukan.' : 'Tidak ada data karyawan.'}
                   </td>
                 </tr>

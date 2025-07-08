@@ -1,47 +1,37 @@
-// src/features/history/components/SummaryPanel.jsx
-
 import React from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-
-// Komponen MUI yang masih kita butuhkan
 import { CircularProgress, Alert } from '@mui/material';
+import { useTheme } from '@mui/material/styles'; // Impor hook useTheme
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const SummaryPanel = ({ summary, loading, error }) => {
-  // Container utama dengan styling Tailwind
-  const panelContainerClass = "p-4 md:p-6 rounded-xl shadow-lg h-full flex flex-col items-center bg-white";
+  const theme = useTheme(); // Dapatkan tema saat ini
+  const isDarkMode = theme.palette.mode === 'dark';
+
+  // [DARK MODE] Tambahkan warna latar dan teks gelap
+  const panelContainerClass = "p-6 rounded-xl shadow-lg h-full flex flex-col items-center bg-white dark:bg-gray-800";
 
   if (loading) {
     return (
       <div className={`${panelContainerClass} justify-center`}>
-        <CircularProgress size={40} />
-        <p className="mt-3 text-gray-600">Mencari data ringkasan...</p>
+        <CircularProgress />
+        <p className="mt-3 text-gray-600 dark:text-gray-400">Mencari data ringkasan...</p>
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div className={panelContainerClass}>
-        <Alert severity="error" className="w-full">
-          Gagal memuat data ringkasan. Silakan coba lagi.
-        </Alert>
-      </div>
-    );
+    return <div className={panelContainerClass}><Alert severity="error" className="w-full">Gagal memuat data.</Alert></div>;
   }
 
   if (!summary) {
     return (
       <div className={`${panelContainerClass} justify-center text-center`}>
-        <h2 className="text-xl font-bold text-green-700 mb-2">
-          Ringkasan Harian
-        </h2>
-        <p className="text-gray-600">
-          Data ringkasan aktivitas akan muncul di sini setelah ada perjalanan.
-        </p>
+        <h2 className="text-xl font-bold text-green-700 dark:text-green-400 mb-2">Ringkasan Harian</h2>
+        <p className="text-gray-600 dark:text-gray-400">Data ringkasan akan muncul di sini.</p>
       </div>
     );
   }
@@ -52,14 +42,12 @@ const SummaryPanel = ({ summary, loading, error }) => {
 
   const chartData = {
     labels: ['Di Area Kerja', 'Di Luar Area'],
-    datasets: [
-      {
-        data: [summary.totalWorkMinutes, summary.totalOutsideAreaMinutes],
-        backgroundColor: ['#2b8c3d', '#E74C3C'],
-        borderColor: ['#FFFFFF', '#FFFFFF'],
-        borderWidth: 3,
-      },
-    ],
+    datasets: [{
+      data: [summary.totalWorkMinutes, summary.totalOutsideAreaMinutes],
+      backgroundColor: ['#2b8c3d', '#E74C3C'],
+      borderColor: [isDarkMode ? '#1f2937' : '#FFFFFF'], // Sesuaikan border chart
+      borderWidth: 3,
+    }],
   };
 
   const chartOptions = {
@@ -72,6 +60,7 @@ const SummaryPanel = ({ summary, loading, error }) => {
         position: 'bottom',
         labels: {
           padding: 25,
+          color: isDarkMode ? '#9ca3af' : '#6b7280', // Sesuaikan warna teks legenda
           font: { size: 13, family: 'Poppins, sans-serif' },
           boxWidth: 20,
         },
@@ -83,14 +72,8 @@ const SummaryPanel = ({ summary, loading, error }) => {
           const percentage = ((value / total) * 100).toFixed(1);
           return `${percentage}%`;
         },
-        color: '#333',
-        font: {
-          weight: 'bold',
-          size: 15,
-          family: 'Poppins, sans-serif'
-        },
-        anchor: 'center',
-        align: 'center',
+        color: isDarkMode ? '#FFFFFF' : '#333', // Sesuaikan warna teks data label
+        font: { weight: 'bold', size: 15, family: 'Poppins, sans-serif' },
       },
       tooltip: {
         bodyFont: { size: 14 },
@@ -102,22 +85,20 @@ const SummaryPanel = ({ summary, loading, error }) => {
 
   return (
     <div className={panelContainerClass}>
-      <h2 className="text-xl text-center mb-4 text-green-700 font-bold">
+      <h2 className="text-xl text-center mb-4 text-green-700 dark:text-green-400 font-bold">
         Ringkasan Aktivitas Harian
       </h2>
-
       <div className="h-[250px] w-full relative">
         <Doughnut options={chartOptions} data={chartData} plugins={[ChartDataLabels]} />
       </div>
-
       <div className="mt-6 text-center w-full text-sm">
-        <p className="mb-2 text-gray-700">
+        <p className="mb-2 text-gray-700 dark:text-gray-300">
           <strong>Di Area Kerja:</strong> {summary.totalWorkMinutes.toFixed(1)} menit ({workPercentage.toFixed(1)}%)
         </p>
-        <p className="mb-2 text-gray-700">
+        <p className="mb-2 text-gray-700 dark:text-gray-300">
           <strong>Di Luar Area:</strong> {summary.totalOutsideAreaMinutes.toFixed(1)} menit ({outsidePercentage.toFixed(1)}%)
         </p>
-        <p className="mt-5 text-gray-500 border-t border-gray-200 pt-4">
+        <p className="mt-5 text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-4">
           Update Terakhir: {summary.lastUpdate?.toDate ? summary.lastUpdate.toDate().toLocaleString('id-ID') : 'N/A'}
         </p>
       </div>
