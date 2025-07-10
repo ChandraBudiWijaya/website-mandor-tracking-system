@@ -1,13 +1,11 @@
-# Mandor Banana Tracking Dashboard
+# Mandor Tracking System Dashboard
 
-![Login Preview](docs/login_preview.png)
-_Opsional: Ganti `docs/login_preview.png` dengan path gambar screenshot halaman login terbaru Anda setelah di-deploy atau di-build._
 
-Aplikasi web dashboard untuk Mandor Banana Tracking, dibangun dengan React, Material-UI, dan Firebase. Dashboard ini bertujuan untuk membantu mandor mengelola dan memantau operasional perkebunan pisang secara lebih efisien, termasuk pelacakan karyawan, ringkasan harian, dan fitur geofence.
+Aplikasi web dashboard untuk Mandor Tracking, dibangun dengan React, Material-UI, dan Firebase. Dashboard ini bertujuan untuk membantu mandor mengelola dan memantau operasional perkebunan secara lebih efisien, termasuk pelacakan mandor, ringkasan harian, dan fitur geofence.
 
 ## Daftar Isi
 
-- [Mandor Banana Tracking Dashboard](#mandor-banana-tracking-dashboard)
+- [Mandor Tracking System Dashboard](#mandor-tracking-system-dashboard)
   - [Daftar Isi](#daftar-isi)
   - [Fitur Utama](#fitur-utama)
   - [Teknologi yang Digunakan](#teknologi-yang-digunakan)
