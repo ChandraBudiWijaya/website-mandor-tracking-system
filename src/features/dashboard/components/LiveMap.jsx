@@ -19,39 +19,81 @@ const stringToColor = (str) => {
   return color;
 };
 
-// Fungsi untuk membuat ikon kustom (tidak berubah)
+// Fungsi untuk membuat ikon kustom yang lebih baik
 const createCustomIcon = (employee) => {
+  const backgroundColor = stringToColor(employee.id);
   const markerHtml = `
-    <div style="
-      background-color: ${stringToColor(employee.id)};
-      width: 30px;
-      height: 30px;
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border: 2px solid #FFFFFF;
-      box-shadow: 0 0 5px rgba(0,0,0,0.5);
-    ">
+    <div style="position: relative; width: 40px; height: 40px;">
+      <!-- Pin utama -->
       <div style="
-        transform: rotate(45deg);
-        color: white;
-        font-size: 14px;
-        font-weight: bold;
-        font-family: 'Poppins', sans-serif;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, ${backgroundColor}, ${backgroundColor}dd);
+        border-radius: 50% 50% 50% 0;
+        transform: translateX(-50%) rotate(-45deg);
+        border: 3px solid #FFFFFF;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
       ">
-        ${employee.name.charAt(0)}
+        <!-- Initial huruf -->
+        <div style="
+          transform: rotate(45deg);
+          color: white;
+          font-size: 14px;
+          font-weight: bold;
+          font-family: 'Poppins', sans-serif;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+          line-height: 1;
+        ">
+          ${employee.name.charAt(0)}
+        </div>
       </div>
+      
+      <!-- Pulse effect untuk online status -->
+      <div style="
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 32px;
+        height: 32px;
+        background: ${backgroundColor}40;
+        border-radius: 50% 50% 50% 0;
+        transform: translateX(-50%) rotate(-45deg);
+        animation: pulse-pin 2s infinite;
+      "></div>
     </div>
+    
+    <style>
+      @keyframes pulse-pin {
+        0% {
+          transform: translateX(-50%) rotate(-45deg) scale(1);
+          opacity: 1;
+        }
+        70% {
+          transform: translateX(-50%) rotate(-45deg) scale(1.4);
+          opacity: 0;
+        }
+        100% {
+          transform: translateX(-50%) rotate(-45deg) scale(1.4);
+          opacity: 0;
+        }
+      }
+    </style>
   `;
 
   return L.divIcon({
     html: markerHtml,
     className: 'custom-leaflet-icon',
-    iconSize: [30, 30],
-    iconAnchor: [15, 30],
-    popupAnchor: [0, -30]
+    iconSize: [40, 40],
+    iconAnchor: [20, 32],
+    popupAnchor: [0, -32]
   });
 };
 

@@ -14,10 +14,75 @@ let DefaultIcon = L.icon({
 
 const createMovingIcon = () => {
   return L.divIcon({
-    html: `<div style="background-color: #1e8e3e; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.7);"></div>`,
+    html: `
+      <div style="position: relative; width: 32px; height: 32px;">
+        <!-- Pin utama -->
+        <div style="
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 28px;
+          height: 28px;
+          background: linear-gradient(135deg, #1e8e3e, #16a34a);
+          border-radius: 50% 50% 50% 0;
+          transform: translateX(-50%) rotate(-45deg);
+          border: 3px solid white;
+          box-shadow: 0 4px 12px rgba(30, 142, 62, 0.4), 0 0 0 1px rgba(0,0,0,0.1);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        ">
+          <!-- Icon dalam pin -->
+          <div style="
+            transform: rotate(45deg);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 16px;
+            height: 16px;
+          ">●</div>
+        </div>
+        
+        <!-- Pulse effect untuk menunjukkan pergerakan -->
+        <div style="
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 28px;
+          height: 28px;
+          background: rgba(30, 142, 62, 0.3);
+          border-radius: 50% 50% 50% 0;
+          transform: translateX(-50%) rotate(-45deg);
+          animation: pulse-moving 1.5s infinite;
+        "></div>
+      </div>
+      
+      <style>
+        @keyframes pulse-moving {
+          0% {
+            transform: translateX(-50%) rotate(-45deg) scale(1);
+            opacity: 1;
+          }
+          70% {
+            transform: translateX(-50%) rotate(-45deg) scale(1.3);
+            opacity: 0;
+          }
+          100% {
+            transform: translateX(-50%) rotate(-45deg) scale(1.3);
+            opacity: 0;
+          }
+        }
+      </style>
+    `,
     className: '',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
+    iconSize: [32, 32],
+    iconAnchor: [16, 28],
+    popupAnchor: [0, -28]
   });
 };
 
