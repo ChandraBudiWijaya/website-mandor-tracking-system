@@ -57,7 +57,7 @@ const Navbar = () => {
       <div className="flex items-center gap-2.5">
         <img src={appLogo} alt="GGF Logo" className="h-[88px] w-auto" />
         <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 -tracking-wide">
-          Mandor Banana Tracking
+          Mandor Tracking System
         </h1>
       </div>
 

@@ -77,7 +77,7 @@ function MapEffect({ locations, selectedEmployeeId }) {
             map.fitBounds(latLngs, { padding: [50, 50], maxZoom: 15 });
         }
     }
-  }, [selectedEmployeeId, map]); // <-- Hapus `locations` dari dependensi ini
+  }, [selectedEmployeeId, map, locations]); // <-- Hapus `locations` dari dependensi ini
 
   // Efek ini HANYA untuk mengatur tampilan awal peta
   useEffect(() => {

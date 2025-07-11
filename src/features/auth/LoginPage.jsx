@@ -56,7 +56,7 @@ function LoginPage() {
         }}
       >
         <h1 className="text-5xl font-bold leading-tight mb-4" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
-          Mandor Banana Tracking
+          Mandor Tracking System
         </h1>
         <p className="text-xl font-light max-w-2xl opacity-90" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.7)' }}>
           Kelola dan pantau seluruh operasional perkebunan pisang Anda dengan lebih efisien dan akurat. Dapatkan informasi real-time dan tingkatkan produktivitas tim Anda.
