@@ -51,16 +51,41 @@ const FloatingPlaybackControls = ({
 
   const handleMapFullscreen = () => {
     const mapContainer = document.querySelector('.history-map-container');
+    
+    if (!mapContainer) {
+      console.warn('Map container not found for fullscreen');
+      return;
+    }
+    
     if (!isMapFullscreen) {
       // Enter fullscreen
       if (mapContainer.requestFullscreen) {
-        mapContainer.requestFullscreen();
+        mapContainer.requestFullscreen().catch(err => {
+          console.error('Error attempting to enable fullscreen:', err);
+        });
+      } else if (mapContainer.webkitRequestFullscreen) {
+        mapContainer.webkitRequestFullscreen();
+      } else if (mapContainer.msRequestFullscreen) {
+        mapContainer.msRequestFullscreen();
+      } else if (mapContainer.mozRequestFullScreen) {
+        mapContainer.mozRequestFullScreen();
+      } else {
+        console.warn('Fullscreen API is not supported');
+        return;
       }
       setIsMapFullscreen(true);
     } else {
       // Exit fullscreen
       if (document.exitFullscreen) {
-        document.exitFullscreen();
+        document.exitFullscreen().catch(err => {
+          console.error('Error attempting to exit fullscreen:', err);
+        });
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
       }
       setIsMapFullscreen(false);
     }
@@ -69,11 +94,27 @@ const FloatingPlaybackControls = ({
   // Listen for fullscreen changes
   React.useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsMapFullscreen(!!document.fullscreenElement);
+      const isFullscreen = !!(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      );
+      setIsMapFullscreen(isFullscreen);
     };
     
+    // Add event listeners for different browsers
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
   }, []);
 
   if (!logs || logs.length === 0) return null;

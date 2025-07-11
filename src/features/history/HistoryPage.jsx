@@ -2,16 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useEmployees } from '../../hooks/useEmployees';
 import { useHistoryData } from './hooks/useHistoryData';
 import HistoryMap from './components/HistoryMap';
+import HistoryForm from './components/HistoryForm';
 import SummaryPanel from './components/SummaryPanel';
 import {
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
   CircularProgress,
-  Button,
-  Box,
   Alert,
 } from '@mui/material';
 
@@ -45,17 +39,12 @@ function HistoryPage() {
     return () => clearInterval(timerRef.current);
   }, [isPlaying, logs, playbackSpeed]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (employeeId, date) => {
     setPageError('');
-    if (!selectedEmployee || !selectedDate) {
-      setPageError('Silakan pilih karyawan dan tanggal terlebih dahulu.');
-      return;
-    }
     setIsPlaying(false);
     setIsPlaybackActive(false);
     setPlaybackIndex(0);
-    fetchData(selectedEmployee, selectedDate);
+    fetchData(employeeId, date);
   };
 
   const handlePlayPause = () => {
@@ -107,105 +96,73 @@ function HistoryPage() {
   const currentMarker = isPlaybackActive ? logs[playbackIndex] : null;
 
   return (
-    // [DARK MODE] Tambahkan warna latar gelap
-    <div className="p-5 bg-gray-100 dark:bg-gray-900 min-h-[calc(100vh-70px)] transition-colors duration-300">
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-        Riwayat Perjalanan
-      </h1>
-
-      {/* Form Pencarian */}
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        className="mb-5 p-5 bg-white dark:bg-gray-800 rounded-xl shadow-md flex flex-col sm:flex-row flex-wrap items-end gap-4"
-      >
-        <div className="w-full sm:w-auto sm:min-w-[200px]">
-          <FormControl fullWidth>
-            <InputLabel>Pilih Karyawan</InputLabel>
-            <Select
-              value={selectedEmployee}
-              onChange={(e) => setSelectedEmployee(e.target.value)}
-              label="Pilih Karyawan"
-              disabled={loadingEmployees}
-            >
-              <MenuItem value="">
-                {loadingEmployees && <CircularProgress size={20} className="mr-2" />}
-                {loadingEmployees ? 'Memuat...' : '-- Pilih Mandor --'}
-              </MenuItem>
-              {employees.map(emp => (
-                <MenuItem key={emp.id} value={emp.id}>{emp.name}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            Riwayat Perjalanan
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Lihat dan analisis riwayat perjalanan karyawan berdasarkan tanggal
+          </p>
         </div>
-        <div className="w-full sm:w-auto sm:min-w-[160px]">
-          <TextField
-            fullWidth
-            label="Pilih Tanggal"
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-          />
-        </div>
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={loadingHistory || loadingEmployees}
-          className="w-full sm:w-auto bg-green-700 hover:bg-green-800"
-        >
-          {loadingHistory ? 'Mencari...' : 'Tampilkan Riwayat'}
-        </Button>
-      </Box>
 
-      {pageError && (
-        <Alert severity="warning" sx={{ mb: 3 }} onClose={() => setPageError('')}>
-          {pageError}
-        </Alert>
-      )}
+        {/* Form Pencarian */}
+        <HistoryForm
+          selectedEmployee={selectedEmployee}
+          setSelectedEmployee={setSelectedEmployee}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          employees={employees}
+          loadingEmployees={loadingEmployees}
+          loadingHistory={loadingHistory}
+          pageError={pageError}
+          setPageError={setPageError}
+          onSubmit={handleSubmit}
+        />
 
-      <hr className="my-8 border-gray-300 dark:border-gray-700" />
+        {/* Layout Flex Column untuk Peta dan Ringkasan */}
+        <div id="history-results" className="flex flex-col gap-6">
+          {/* Peta - Full Width dan Lebih Tinggi */}
+          <div className="history-map-container w-full h-[600px] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden flex items-center justify-center">
+            {loadingHistory ? (
+              <div className="flex flex-col items-center"><CircularProgress /><p className="mt-2 text-gray-600 dark:text-gray-400">Memuat Peta...</p></div>
+            ) : (
+              <HistoryMap
+                logs={logsForMap}
+                allLogs={logs}  // Tambahkan logs asli untuk FloatingPlaybackControls
+                currentMarker={currentMarker}
+                geofence={geofence}
+                isPlaying={isPlaying}
+                playbackIndex={playbackIndex}
+                playbackSpeed={playbackSpeed}
+                isPlaybackActive={isPlaybackActive}
+                onPlayPause={handlePlayPause}
+                onSliderChange={handleSliderChange}
+                onSpeedChange={handleSpeedChange}
+                onStop={handleStop}
+                onNext={handleNext}
+                onPrevious={handlePrevious}
+                showPlaybackControls={true}
+                employeeName={employees.find(emp => emp.id === selectedEmployee)?.name}
+                selectedDate={selectedDate}
+              />
+            )}
+          </div>
+          
+          {/* Summary Panel - Full Width di Bawah Peta */}
+          <div className="w-full">
+            <SummaryPanel summary={summary} loading={loadingHistory} error={error} />
+          </div>
+        </div>
 
-      {/* Layout Flex Column untuk Peta dan Ringkasan */}
-      <div id="history-results" className="flex flex-col gap-6">
-        {/* Peta - Full Width dan Lebih Tinggi */}
-        <div className="history-map-container w-full h-[600px] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden flex items-center justify-center">
-          {loadingHistory ? (
-            <div className="flex flex-col items-center"><CircularProgress /><p className="mt-2 text-gray-600 dark:text-gray-400">Memuat Peta...</p></div>
-          ) : (
-            <HistoryMap
-              logs={logsForMap}
-              allLogs={logs}  // Tambahkan logs asli untuk FloatingPlaybackControls
-              currentMarker={currentMarker}
-              geofence={geofence}
-              isPlaying={isPlaying}
-              playbackIndex={playbackIndex}
-              playbackSpeed={playbackSpeed}
-              isPlaybackActive={isPlaybackActive}
-              onPlayPause={handlePlayPause}
-              onSliderChange={handleSliderChange}
-              onSpeedChange={handleSpeedChange}
-              onStop={handleStop}
-              onNext={handleNext}
-              onPrevious={handlePrevious}
-              showPlaybackControls={true}
-              employeeName={employees.find(emp => emp.id === selectedEmployee)?.name}
-              selectedDate={selectedDate}
-            />
-          )}
-        </div>
-        
-        {/* Summary Panel - Full Width di Bawah Peta */}
-        <div className="w-full">
-          <SummaryPanel summary={summary} loading={loadingHistory} error={error} />
-        </div>
+        {error && (
+          <div className="mt-6">
+            <Alert severity="error">Gagal memuat data. Silakan coba lagi.</Alert>
+          </div>
+        )}
       </div>
-
-      {error && (
-        <div className="p-5 mt-4">
-          <Alert severity="error">Gagal memuat data. Silakan coba lagi.</Alert>
-        </div>
-      )}
     </div>
   );
 }

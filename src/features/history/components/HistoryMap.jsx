@@ -81,7 +81,7 @@ const HistoryMap = ({
   };
 
   return (
-    <div className="h-full w-full">
+    <div className="history-map-container h-full w-full">
       <MapContainer 
         key={geofencePath ? geofencePath.toString() : pathCoordinates.toString()} // Reset peta saat data utama berubah
         center={[-4.5586, 105.4068]} 
