@@ -11,12 +11,9 @@ import {
   TextField,
   CircularProgress,
   Button,
-  IconButton,
-  Slider,
   Box,
   Alert,
 } from '@mui/material';
-import { FaPlay, FaPause } from 'react-icons/fa';
 
 function HistoryPage() {
   const [selectedEmployee, setSelectedEmployee] = useState('');
@@ -70,6 +67,32 @@ function HistoryPage() {
       setPlaybackIndex(0);
     }
     setIsPlaying(!isPlaying);
+  };
+
+  const handleStop = () => {
+    setIsPlaying(false);
+    setIsPlaybackActive(false);
+    setPlaybackIndex(0);
+  };
+
+  const handleNext = () => {
+    if (playbackIndex < logs.length - 1) {
+      setIsPlaying(false);
+      setIsPlaybackActive(true);
+      setPlaybackIndex(playbackIndex + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (playbackIndex > 0) {
+      setIsPlaying(false);
+      setIsPlaybackActive(true);
+      setPlaybackIndex(playbackIndex - 1);
+    }
+  };
+
+  const handleSpeedChange = (newSpeed) => {
+    setPlaybackSpeed(newSpeed);
   };
 
   const handleSliderChange = (event, newValue) => {
@@ -141,57 +164,39 @@ function HistoryPage() {
         </Alert>
       )}
 
-      {/* Kontrol Playback */}
-      {!loadingHistory && logs.length > 0 && (
-        <div className="mb-5 p-5 bg-white dark:bg-gray-800 rounded-xl shadow-md">
-          <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Kontrol Playback
-          </h3>
-          <div className="flex items-center gap-4">
-            <IconButton onClick={handlePlayPause} className="bg-green-700 text-white hover:bg-green-800">
-              {isPlaying ? <FaPause /> : <FaPlay />}
-            </IconButton>
-            <Slider
-              value={playbackIndex}
-              min={0}
-              max={logs.length - 1}
-              onChange={handleSliderChange}
-              valueLabelDisplay="auto"
-              valueLabelFormat={(value) => logs[value]?.device_timestamp.toDate().toLocaleTimeString('id-ID') || ''}
-            />
-            <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
-              <InputLabel>Kecepatan</InputLabel>
-              <Select
-                value={playbackSpeed}
-                onChange={(e) => setPlaybackSpeed(e.target.value)}
-                label="Kecepatan"
-              >
-                <MenuItem value={400}>0.5x</MenuItem>
-                <MenuItem value={200}>1x (Normal)</MenuItem>
-                <MenuItem value={100}>2x</MenuItem>
-                <MenuItem value={50}>4x</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-        </div>
-      )}
-
       <hr className="my-8 border-gray-300 dark:border-gray-700" />
 
-      {/* Grid untuk Peta dan Ringkasan */}
-      <div id="history-results" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 h-[500px] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden flex items-center justify-center">
+      {/* Layout Flex Column untuk Peta dan Ringkasan */}
+      <div id="history-results" className="flex flex-col gap-6">
+        {/* Peta - Full Width dan Lebih Tinggi */}
+        <div className="history-map-container w-full h-[600px] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden flex items-center justify-center">
           {loadingHistory ? (
             <div className="flex flex-col items-center"><CircularProgress /><p className="mt-2 text-gray-600 dark:text-gray-400">Memuat Peta...</p></div>
           ) : (
             <HistoryMap
               logs={logsForMap}
+              allLogs={logs}  // Tambahkan logs asli untuk FloatingPlaybackControls
               currentMarker={currentMarker}
               geofence={geofence}
+              isPlaying={isPlaying}
+              playbackIndex={playbackIndex}
+              playbackSpeed={playbackSpeed}
+              isPlaybackActive={isPlaybackActive}
+              onPlayPause={handlePlayPause}
+              onSliderChange={handleSliderChange}
+              onSpeedChange={handleSpeedChange}
+              onStop={handleStop}
+              onNext={handleNext}
+              onPrevious={handlePrevious}
+              showPlaybackControls={true}
+              employeeName={employees.find(emp => emp.id === selectedEmployee)?.name}
+              selectedDate={selectedDate}
             />
           )}
         </div>
-        <div className="lg:col-span-1">
+        
+        {/* Summary Panel - Full Width di Bawah Peta */}
+        <div className="w-full">
           <SummaryPanel summary={summary} loading={loadingHistory} error={error} />
         </div>
       </div>

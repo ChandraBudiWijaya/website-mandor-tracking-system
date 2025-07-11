@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Polyline, Polygon, Marker, Popup, useMap, LayersControl } from 'react-leaflet';
 import L from 'leaflet';
+import FloatingPlaybackControls from './FloatingPlaybackControls';
 
 let DefaultIcon = L.icon({
     iconUrl: require('leaflet/dist/images/marker-icon.png'),
@@ -30,18 +31,38 @@ function HistoryMapEffect({ path, geofencePath, currentMarker }) {
         else if (geofencePath && geofencePath.length > 0) {
             map.fitBounds(geofencePath, { padding: [50, 50], maxZoom: 17 });
         }
-    }, [path, geofencePath]);
+    }, [path, geofencePath, map]);
 
     useEffect(() => {
         if (currentMarker) {
             map.panTo([currentMarker.lat, currentMarker.lng]);
         }
-    }, [currentMarker]);
+    }, [currentMarker, map]);
 
     return null;
 }
 
-const HistoryMap = ({ logs, geofence, currentMarker }) => {
+const HistoryMap = ({ 
+  logs, 
+  allLogs, // Logs asli untuk FloatingPlaybackControls
+  geofence, 
+  currentMarker, 
+  // Playback controls props
+  isPlaying,
+  playbackIndex,
+  playbackSpeed,
+  isPlaybackActive,
+  onPlayPause,
+  onSliderChange,
+  onSpeedChange,
+  onStop,
+  onNext,
+  onPrevious,
+  showPlaybackControls = true,
+  // Info untuk fullscreen
+  employeeName,
+  selectedDate
+}) => {
   const safeLogs = Array.isArray(logs) ? logs : [];
   const pathCoordinates = safeLogs.map(log => [log.lat, log.lng]);
   const hasData = safeLogs.length > 0;
@@ -116,6 +137,25 @@ const HistoryMap = ({ logs, geofence, currentMarker }) => {
         )}
 
         <HistoryMapEffect path={pathCoordinates} geofencePath={geofencePath} currentMarker={currentMarker} />
+        
+        {/* Floating Playback Controls */}
+        {showPlaybackControls && hasData && (
+          <FloatingPlaybackControls
+            logs={allLogs || safeLogs}  // Gunakan allLogs jika tersedia, fallback ke safeLogs
+            isPlaying={isPlaying}
+            playbackIndex={playbackIndex}
+            playbackSpeed={playbackSpeed}
+            isPlaybackActive={isPlaybackActive}
+            onPlayPause={onPlayPause}
+            onSliderChange={onSliderChange}
+            onSpeedChange={onSpeedChange}
+            onStop={onStop}
+            onNext={onNext}
+            onPrevious={onPrevious}
+            employeeName={employeeName}
+            selectedDate={selectedDate}
+          />
+        )}
       </MapContainer>
     </div>
   );
