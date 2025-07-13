@@ -1,88 +1,104 @@
-# Mandor Tracking System
-[![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/ChandraBudiWijaya/website-mandor-tracking-system.git)
+<!-- Centered Project Title -->
+<h1 align="center">📍 WEBSITE-MANDOR-TRACKING-SYSTEM 📍</h1>
 
-A web-based dashboard for the Mandor Tracking System, built with React, Material-UI, and Firebase. This dashboard helps supervisors efficiently manage and monitor plantation operations, featuring real-time foreman tracking, daily activity summaries, and geofence management.
+<p align="center"><i>Transforming Operations with Real-Time Precision and Insight</i></p>
 
-## Table of Contents
-- [Mandor Tracking System](#mandor-tracking-system)
-  - [Table of Contents](#table-of-contents)
-  - [Features](#features)
-  - [Technology Stack](#technology-stack)
-  - [Project Structure](#project-structure)
-  - [Setup and Installation](#setup-and-installation)
-  - [Usage](#usage)
+<p align="center">
+  <img src="https://img.shields.io/badge/last%20commit-last%20friday-informational?style=flat-square" />
+  <img src="https://img.shields.io/badge/javascript-96.8%25-yellow?style=flat-square" />
+  <img src="https://img.shields.io/badge/languages-3-blue?style=flat-square" />
+</p>
 
-## Features
+<p align="center">
+  <img src="https://img.shields.io/badge/-JSON-black?style=flat-square" />
+  <img src="https://img.shields.io/badge/-Markdown-black?style=flat-square" />
+  <img src="https://img.shields.io/badge/-npm-red?style=flat-square" />
+  <img src="https://img.shields.io/badge/-Autoprefixer-d9534f?style=flat-square" />
+  <img src="https://img.shields.io/badge/-Firebase-ffca28?style=flat-square" />
+  <img src="https://img.shields.io/badge/-PostCSS-d73a49?style=flat-square" />
+  <img src="https://img.shields.io/badge/-JavaScript-f7df1e?style=flat-square&logo=javascript&logoColor=black" />
+  <img src="https://img.shields.io/badge/-Leaflet-199900?style=flat-square" />
+  <img src="https://img.shields.io/badge/-React-61dafb?style=flat-square&logo=react&logoColor=black" />
+  <img src="https://img.shields.io/badge/-Chart.js-ff6384?style=flat-square" />
+</p>
 
--   **Secure Authentication**: Robust login system using Firebase Authentication (Email/Password) with session timeout for inactivity.
--   **Live Dashboard**: Real-time map displaying the current location of all employees, with a selectable and collapsible employee list.
--   **Location History**: Review the historical path of an employee for a specific date, with playback controls (play, pause, speed adjustment) to visualize movement over time.
--   **Daily Summary**: View a detailed summary of daily operational data, including a doughnut chart that visualizes time spent inside versus outside the designated work area.
--   **Employee Management**: Full CRUD (Create, Read, Update, Delete) functionality for managing employee data.
--   **Geofence Management**: Create, edit, and delete designated work areas (Geofences) by drawing polygons on a map and assigning them to specific employees.
--   **Modern UI**: A responsive and visually appealing user interface built with Material-UI, featuring a light/dark mode toggle and a "frosted glass" aesthetic on the login page.
+---
 
-## Technology Stack
+## 📘 Deskripsi
 
-**Frontend:**
--   **React.js**: Core UI library.
--   **React Router**: For client-side routing and navigation.
--   **Material-UI (MUI_v5)** & **Emotion**: For UI components and styling.
--   **Tailwind CSS**: For utility-first styling.
--   **Leaflet** & **React-Leaflet**: For interactive maps.
--   **Leaflet-Draw**: For drawing and editing geofences on the map.
--   **Chart.js** & **React-Chartjs-2**: For creating summary charts.
--   **React Pro Sidebar**: For the collapsible sidebar navigation.
+**Website-Mandor-Tracking-System** adalah dashboard berbasis web yang digunakan untuk **monitoring aktivitas tenaga kerja di area perkebunan secara real-time**. Sistem ini memanfaatkan **React**, **Firebase**, dan **Leaflet.js** untuk memberikan informasi yang akurat, visualisasi lokasi, serta pengelolaan data karyawan dan area kerja.
 
-**Backend / Database:**
--   **Firebase**:
-    -   **Authentication**: For user login management.
-    -   **Firestore**: As the NoSQL database for storing employee data, location logs, geofences, and daily summaries.
+---
 
-## Project Structure
+## 🚀 Fitur Utama
 
-The project is structured to separate concerns, making it modular and maintainable.
+- 🔐 **Autentikasi Aman** — Login menggunakan Firebase Auth dengan timeout otomatis.
+- 🗺️ **Live Dashboard** — Peta real-time dengan daftar karyawan aktif yang dapat diklik.
+- 📍 **Riwayat Lokasi** — Playback pergerakan karyawan berdasarkan tanggal yang dipilih.
+- 📊 **Ringkasan Harian** — Visualisasi waktu dalam/luar area kerja dalam bentuk donut chart.
+- 👥 **Manajemen Karyawan** — CRUD karyawan dengan form interaktif.
+- 🗂️ **Geofence Management** — Buat/edit area kerja dengan menggambar polygon.
+- 🌙 **Modern UI** — Responsif, dark mode, dan tampilan frosted-glass login.
+
+---
+
+## 🛠️ Teknologi yang Digunakan
+
+### Frontend:
+- ⚛️ React.js
+- 🧭 React Router
+- 🎨 Material-UI v5 & Emotion
+- 💨 Tailwind CSS
+- 🌍 Leaflet & React-Leaflet
+- ✏️ Leaflet-Draw
+- 📈 Chart.js & React-Chartjs-2
+- 📚 React Pro Sidebar
+
+### Backend & Database:
+- 🔥 Firebase (Auth, Firestore)
+
+---
+
+## 📁 Struktur Proyek
 
 ```
 src/
-├── api/              # Firebase configuration and initialization.
-├── assets/           # Static assets like images and SVGs.
-├── components/       # Shared, reusable UI components (Navbar, Sidebar, etc.).
-├── context/          # React Context for global state (Authentication, Theme).
-├── features/         # Core application modules, divided by feature.
-│   ├── auth/         # Login page and related components.
-│   ├── dashboard/    # Real-time tracking dashboard, map, and employee list.
-│   ├── history/      # Location history page, map, summary panel, and hooks.
-│   └── management/   # Employee and Geofence management pages and modals.
-├── hooks/            # Custom reusable hooks (e.g., useEmployees, useGeofences).
-└── theme/            # Theme configuration for Material-UI (light/dark modes).
+├── api/              # Firebase config
+├── assets/           # Gambar, SVG, dsb.
+├── components/       # Komponen UI umum (Navbar, Sidebar)
+├── context/          # Global state (Auth, Theme)
+├── features/         # Modul fitur utama
+│   ├── auth/         # Halaman login
+│   ├── dashboard/    # Peta & daftar pekerja
+│   ├── history/      # Riwayat lokasi & ringkasan
+│   └── management/   # Manajemen karyawan & area kerja
+├── hooks/            # Custom hooks (useEmployees, useGeofences)
+└── theme/            # Konfigurasi dark/light theme
 ```
 
-## Setup and Installation
+---
 
-To run this project locally, follow these steps:
+## 🧰 Instalasi dan Setup
 
-**1. Prerequisites:**
--   Node.js (v14.x or higher)
--   npm (v8.x or higher) or Yarn
+### 1. Prasyarat
+- Node.js v14+
+- npm atau Yarn
 
-**2. Clone the Repository:**
+### 2. Clone Repo
 ```bash
 git clone https://github.com/chandrabudiwijaya/website-mandor-tracking-system.git
 cd website-mandor-tracking-system
 ```
 
-**3. Install Dependencies:**
+### 3. Install Dependency
 ```bash
 npm install
-```
-or
-```bash
+# atau
 yarn install
 ```
 
-**4. Set Up Environment Variables:**
-Create a `.env` file in the root of the project and add your Firebase project configuration. You can find these credentials in your Firebase project console.
+### 4. Konfigurasi Firebase
+Buat file `.env` dan tambahkan konfigurasi berikut:
 ```
 REACT_APP_API_KEY=your_api_key
 REACT_APP_AUTH_DOMAIN=your_auth_domain
@@ -92,17 +108,41 @@ REACT_APP_MESSAGING_SENDER_ID=your_messaging_sender_id
 REACT_APP_APP_ID=your_app_id
 ```
 
-**5. Start the Development Server:**
+### 5. Jalankan Aplikasi
 ```bash
 npm start
 ```
-The application will be available at `http://localhost:3000`.
+Akses di `http://localhost:3000`
 
-## Usage
+---
 
--   **Login**: Use the credentials configured in your Firebase Authentication to log in.
--   **Dasbor (Dashboard)**: View the live location of all active employees. Click on an employee from the list to focus the map on their location.
--   **Riwayat (History)**: Select an employee and a date to view their travel path. Use the playback controls to see their movement chronologically. A summary chart will show the time spent within their assigned geofence.
--   **Manajemen (Management)**:
-    -   **Karyawan (Employees)**: Add new employees, update their details, or remove them from the system.
-    -   **Area Kerja (Work Areas)**: Define geofences by drawing on the map, assign them to employees, and manage existing areas.
+## 💻 Cara Penggunaan
+
+### 🔐 Login
+Gunakan akun yang sudah didaftarkan di Firebase Auth.
+
+### 📊 Dasbor
+- Menampilkan lokasi pekerja secara real-time.
+- Klik nama karyawan untuk fokus ke lokasinya.
+
+### 🧭 Riwayat Lokasi
+- Pilih karyawan dan tanggal.
+- Playback pergerakan + grafik ringkasan (inside vs outside geofence).
+
+### 🛠️ Manajemen
+- **Karyawan**: Tambah/edit/hapus pekerja.
+- **Area Kerja**: Gambar area kerja di peta dan tetapkan ke karyawan.
+
+---
+
+## ✨ Kontribusi
+Pull request sangat disambut! Untuk perubahan besar, harap buka issue terlebih dahulu.
+
+---
+
+## 📝 Lisensi
+MIT License © 2025 Chandra Budi Wijaya
+
+---
+
+> Dokumentasi ini disusun untuk mempermudah deployment dan pengembangan lanjutan oleh tim backend, frontend, dan admin operasional.
