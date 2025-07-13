@@ -30,13 +30,13 @@ function HistoryMapEffect({ path, geofencePath, currentMarker }) {
         else if (geofencePath && geofencePath.length > 0) {
             map.fitBounds(geofencePath, { padding: [50, 50], maxZoom: 17 });
         }
-    }, [path, geofencePath]);
+    }, [path, geofencePath, map]);
 
     useEffect(() => {
         if (currentMarker) {
             map.panTo([currentMarker.lat, currentMarker.lng]);
         }
-    }, [currentMarker]);
+    }, [currentMarker, map]);
 
     return null;
 }
