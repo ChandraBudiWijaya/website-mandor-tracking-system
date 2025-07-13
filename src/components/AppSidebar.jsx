@@ -92,7 +92,7 @@ const AppSidebar = () => {
           <div className={`flex items-center justify-between mb-5 ${isCollapsed ? 'p-5 py-5' : 'px-6 py-5'}`}>
             {!isCollapsed && (
               <span className="text-xl font-bold text-white uppercase tracking-wider">
-                MandorApp
+                Menu App
               </span>
             )}
             <button
