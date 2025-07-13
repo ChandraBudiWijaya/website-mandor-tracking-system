@@ -1,51 +1,108 @@
-# Mandor Tracking System Dashboard
+# Mandor Tracking System
+[![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/ChandraBudiWijaya/website-mandor-tracking-system.git)
 
+A web-based dashboard for the Mandor Tracking System, built with React, Material-UI, and Firebase. This dashboard helps supervisors efficiently manage and monitor plantation operations, featuring real-time foreman tracking, daily activity summaries, and geofence management.
 
-Aplikasi web dashboard untuk Mandor Tracking, dibangun dengan React, Material-UI, dan Firebase. Dashboard ini bertujuan untuk membantu mandor mengelola dan memantau operasional perkebunan secara lebih efisien, termasuk pelacakan mandor, ringkasan harian, dan fitur geofence.
+## Table of Contents
+- [Mandor Tracking System](#mandor-tracking-system)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Technology Stack](#technology-stack)
+  - [Project Structure](#project-structure)
+  - [Setup and Installation](#setup-and-installation)
+  - [Usage](#usage)
 
-## Daftar Isi
+## Features
 
-- [Mandor Tracking System Dashboard](#mandor-tracking-system-dashboard)
-  - [Daftar Isi](#daftar-isi)
-  - [Fitur Utama](#fitur-utama)
-  - [Teknologi yang Digunakan](#teknologi-yang-digunakan)
-    - [Frontend:](#frontend)
-    - [Backend / Database:](#backend--database)
-  - [Persyaratan Sistem](#persyaratan-sistem)
+-   **Secure Authentication**: Robust login system using Firebase Authentication (Email/Password) with session timeout for inactivity.
+-   **Live Dashboard**: Real-time map displaying the current location of all employees, with a selectable and collapsible employee list.
+-   **Location History**: Review the historical path of an employee for a specific date, with playback controls (play, pause, speed adjustment) to visualize movement over time.
+-   **Daily Summary**: View a detailed summary of daily operational data, including a doughnut chart that visualizes time spent inside versus outside the designated work area.
+-   **Employee Management**: Full CRUD (Create, Read, Update, Delete) functionality for managing employee data.
+-   **Geofence Management**: Create, edit, and delete designated work areas (Geofences) by drawing polygons on a map and assigning them to specific employees.
+-   **Modern UI**: A responsive and visually appealing user interface built with Material-UI, featuring a light/dark mode toggle and a "frosted glass" aesthetic on the login page.
 
-## Fitur Utama
+## Technology Stack
 
--   **Autentikasi Pengguna**: Sistem login yang aman dengan Firebase Authentication (Email/Password).
--   **Manajemen Karyawan**: Fitur CRUD (Create, Read, Update, Delete) untuk data karyawan.
--   **Pelacakan Sejarah**: Melihat riwayat lokasi dan aktivitas karyawan pada tanggal tertentu.
--   **Ringkasan Harian**: Melihat ringkasan data operasional harian.
--   **Geofencing**: Memantau pergerakan karyawan dalam area kerja yang telah ditentukan.
--   **UI Modern**: Antarmuka pengguna yang responsif dan menarik dengan Material-UI dan desain _frosted glass_.
+**Frontend:**
+-   **React.js**: Core UI library.
+-   **React Router**: For client-side routing and navigation.
+-   **Material-UI (MUI_v5)** & **Emotion**: For UI components and styling.
+-   **Tailwind CSS**: For utility-first styling.
+-   **Leaflet** & **React-Leaflet**: For interactive maps.
+-   **Leaflet-Draw**: For drawing and editing geofences on the map.
+-   **Chart.js** & **React-Chartjs-2**: For creating summary charts.
+-   **React Pro Sidebar**: For the collapsible sidebar navigation.
 
-## Teknologi yang Digunakan
+**Backend / Database:**
+-   **Firebase**:
+    -   **Authentication**: For user login management.
+    -   **Firestore**: As the NoSQL database for storing employee data, location logs, geofences, and daily summaries.
 
-### Frontend:
--   **React.js**
--   **Material-UI v5** (untuk komponen UI dan styling)
--   **Emotion** (sebagai engine styling CSS-in-JS untuk Material-UI)
--   **React Router DOM** (untuk navigasi antar halaman)
--   **Google Fonts** (Poppins)
+## Project Structure
 
-### Backend / Database:
--   **Firebase** (Authentication untuk login, Firestore Database untuk penyimpanan data).
+The project is structured to separate concerns, making it modular and maintainable.
 
-## Persyaratan Sistem
+```
+src/
+├── api/              # Firebase configuration and initialization.
+├── assets/           # Static assets like images and SVGs.
+├── components/       # Shared, reusable UI components (Navbar, Sidebar, etc.).
+├── context/          # React Context for global state (Authentication, Theme).
+├── features/         # Core application modules, divided by feature.
+│   ├── auth/         # Login page and related components.
+│   ├── dashboard/    # Real-time tracking dashboard, map, and employee list.
+│   ├── history/      # Location history page, map, summary panel, and hooks.
+│   └── management/   # Employee and Geofence management pages and modals.
+├── hooks/            # Custom reusable hooks (e.g., useEmployees, useGeofences).
+└── theme/            # Theme configuration for Material-UI (light/dark modes).
+```
 
-Sebelum Anda dapat menginstal dan menjalankan proyek ini, pastikan Anda memiliki perangkat lunak berikut terinstal di sistem Anda:
+## Setup and Installation
 
--   **Node.js**: Versi 14.x atau lebih tinggi.
-    -   _Saran: Gunakan [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) untuk mengelola versi Node.js Anda dengan mudah._
--   **npm (Node Package Manager)** atau **Yarn**:
-    -   **npm**: Versi 8.x atau lebih tinggi (biasanya sudah terinstal bersama Node.js).
-    -   **Yarn**: Versi 1.x atau lebih tinggi (jika Anda memilih menggunakan Yarn).
+To run this project locally, follow these steps:
 
-Anda dapat memeriksa versi Node.js dan npm/Yarn Anda dengan menjalankan perintah berikut di terminal:
+**1. Prerequisites:**
+-   Node.js (v14.x or higher)
+-   npm (v8.x or higher) or Yarn
+
+**2. Clone the Repository:**
 ```bash
-node -v
-npm -v
-yarn -v # Jika menggunakan Yarn
+git clone https://github.com/chandrabudiwijaya/website-mandor-tracking-system.git
+cd website-mandor-tracking-system
+```
+
+**3. Install Dependencies:**
+```bash
+npm install
+```
+or
+```bash
+yarn install
+```
+
+**4. Set Up Environment Variables:**
+Create a `.env` file in the root of the project and add your Firebase project configuration. You can find these credentials in your Firebase project console.
+```
+REACT_APP_API_KEY=your_api_key
+REACT_APP_AUTH_DOMAIN=your_auth_domain
+REACT_APP_PROJECT_ID=your_project_id
+REACT_APP_STORAGE_BUCKET=your_storage_bucket
+REACT_APP_MESSAGING_SENDER_ID=your_messaging_sender_id
+REACT_APP_APP_ID=your_app_id
+```
+
+**5. Start the Development Server:**
+```bash
+npm start
+```
+The application will be available at `http://localhost:3000`.
+
+## Usage
+
+-   **Login**: Use the credentials configured in your Firebase Authentication to log in.
+-   **Dasbor (Dashboard)**: View the live location of all active employees. Click on an employee from the list to focus the map on their location.
+-   **Riwayat (History)**: Select an employee and a date to view their travel path. Use the playback controls to see their movement chronologically. A summary chart will show the time spent within their assigned geofence.
+-   **Manajemen (Management)**:
+    -   **Karyawan (Employees)**: Add new employees, update their details, or remove them from the system.
+    -   **Area Kerja (Work Areas)**: Define geofences by drawing on the map, assign them to employees, and manage existing areas.
