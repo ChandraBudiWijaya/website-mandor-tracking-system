@@ -1,4 +1,4 @@
-<!-- Centered Project Title -->
+<div align="center">
 <h1 align="center">📍 WEBSITE-MANDOR-TRACKING-SYSTEM 📍</h1>
 
 <p align="center"><i>Transforming Operations with Real-Time Precision and Insight</i></p>
@@ -9,18 +9,19 @@
   <img src="https://img.shields.io/badge/languages-3-blue?style=flat-square" />
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/-JSON-black?style=flat-square" />
-  <img src="https://img.shields.io/badge/-Markdown-black?style=flat-square" />
-  <img src="https://img.shields.io/badge/-npm-red?style=flat-square" />
-  <img src="https://img.shields.io/badge/-Autoprefixer-d9534f?style=flat-square" />
-  <img src="https://img.shields.io/badge/-Firebase-ffca28?style=flat-square" />
-  <img src="https://img.shields.io/badge/-PostCSS-d73a49?style=flat-square" />
-  <img src="https://img.shields.io/badge/-JavaScript-f7df1e?style=flat-square&logo=javascript&logoColor=black" />
-  <img src="https://img.shields.io/badge/-Leaflet-199900?style=flat-square" />
-  <img src="https://img.shields.io/badge/-React-61dafb?style=flat-square&logo=react&logoColor=black" />
-  <img src="https://img.shields.io/badge/-Chart.js-ff6384?style=flat-square" />
-</p>
+ ### Built with the tools and technologies:
+
+![JSON](https://img.shields.io/badge/JSON-black?style=for-the-badge&logo=json)
+![Markdown](https://img.shields.io/badge/Markdown-black?style=for-the-badge&logo=markdown)
+![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+![Autoprefixer](https://img.shields.io/badge/Autoprefixer-DD3735?style=for-the-badge&logo=autoprefixer&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white)
+![PostCSS](https://img.shields.io/badge/PostCSS-DD3A0A?style=for-the-badge&logo=postcss&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white)
+</div>
 
 ---
 
