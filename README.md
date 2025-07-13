@@ -7,9 +7,10 @@
   <img src="https://img.shields.io/badge/last%20commit-last%20friday-informational?style=flat-square" />
   <img src="https://img.shields.io/badge/javascript-96.8%25-yellow?style=flat-square" />
   <img src="https://img.shields.io/badge/languages-3-blue?style=flat-square" />
+  <img src="https://img.shields.io/badge/license-Apache--2.0-green.svg?style=flat-square" />
 </p>
 
- ### Built with the tools and technologies:
+### Built with the tools and technologies:
 
 ![JSON](https://img.shields.io/badge/JSON-black?style=for-the-badge&logo=json)
 ![Markdown](https://img.shields.io/badge/Markdown-black?style=for-the-badge&logo=markdown)
@@ -25,25 +26,25 @@
 
 ---
 
-## 📘 Deskripsi
+## 📘 Description
 
-**Website-Mandor-Tracking-System** adalah dashboard berbasis web yang digunakan untuk **monitoring aktivitas tenaga kerja di area perkebunan secara real-time**. Sistem ini memanfaatkan **React**, **Firebase**, dan **Leaflet.js** untuk memberikan informasi yang akurat, visualisasi lokasi, serta pengelolaan data karyawan dan area kerja.
-
----
-
-## 🚀 Fitur Utama
-
-- 🔐 **Autentikasi Aman** — Login menggunakan Firebase Auth dengan timeout otomatis.
-- 🗺️ **Live Dashboard** — Peta real-time dengan daftar karyawan aktif yang dapat diklik.
-- 📍 **Riwayat Lokasi** — Playback pergerakan karyawan berdasarkan tanggal yang dipilih.
-- 📊 **Ringkasan Harian** — Visualisasi waktu dalam/luar area kerja dalam bentuk donut chart.
-- 👥 **Manajemen Karyawan** — CRUD karyawan dengan form interaktif.
-- 🗂️ **Geofence Management** — Buat/edit area kerja dengan menggambar polygon.
-- 🌙 **Modern UI** — Responsif, dark mode, dan tampilan frosted-glass login.
+**Website-Mandor-Tracking-System** is a web-based dashboard designed to **monitor workforce activity in plantation areas in real-time**. This system leverages **React**, **Firebase**, and **Leaflet.js** to deliver accurate information, location visualization, and comprehensive data management for employees and work areas.
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
+## 🚀 Key Features
+
+- 🔐 **Secure Authentication** — Login via Firebase Authentication with session timeout.
+- 🗺️ **Live Dashboard** — Real-time map with clickable list of active employees.
+- 📍 **Location History** — Playback of employee movement by selected date.
+- 📊 **Daily Summary** — Donut chart visualizing inside/outside geofence time.
+- 👥 **Employee Management** — CRUD operations with interactive forms.
+- 🗂️ **Geofence Management** — Draw/edit work areas using polygons on map.
+- 🌙 **Modern UI** — Responsive design, dark mode, and frosted-glass login look.
+
+---
+
+## 🛠️ Technology Stack
 
 ### Frontend:
 - ⚛️ React.js
@@ -55,51 +56,57 @@
 - 📈 Chart.js & React-Chartjs-2
 - 📚 React Pro Sidebar
 
-### Backend & Database:
-- 🔥 Firebase (Auth, Firestore)
+### Backend & Database
+
+- Firebase (Authentication & Firestore)
 
 ---
 
-## 📁 Struktur Proyek
+## 📁 Project Structure
 
 ```
 src/
 ├── api/              # Firebase config
-├── assets/           # Gambar, SVG, dsb.
-├── components/       # Komponen UI umum (Navbar, Sidebar)
-├── context/          # Global state (Auth, Theme)
-├── features/         # Modul fitur utama
-│   ├── auth/         # Halaman login
-│   ├── dashboard/    # Peta & daftar pekerja
-│   ├── history/      # Riwayat lokasi & ringkasan
-│   └── management/   # Manajemen karyawan & area kerja
-├── hooks/            # Custom hooks (useEmployees, useGeofences)
-└── theme/            # Konfigurasi dark/light theme
+├── assets/           # Images, SVGs, etc.
+├── components/       # Shared UI components
+├── context/          # Global context (Auth, Theme)
+├── features/         # Main app modules
+│   ├── auth/         # Login page
+│   ├── dashboard/    # Map & employee list
+│   ├── history/      # Location history & chart
+│   └── management/   # Employee & geofence management
+├── hooks/            # Custom hooks
+└── theme/            # Theme settings
 ```
 
 ---
 
-## 🧰 Instalasi dan Setup
+## 🧰 Installation & Setup
 
-### 1. Prasyarat
+### 1. Prerequisites
+
 - Node.js v14+
-- npm atau Yarn
+- npm or Yarn
 
-### 2. Clone Repo
+### 2. Clone the Repository
+
 ```bash
 git clone https://github.com/chandrabudiwijaya/website-mandor-tracking-system.git
 cd website-mandor-tracking-system
 ```
 
-### 3. Install Dependency
+### 3. Install Dependencies
+
 ```bash
 npm install
-# atau
+# or
 yarn install
 ```
 
-### 4. Konfigurasi Firebase
-Buat file `.env` dan tambahkan konfigurasi berikut:
+### 4. Firebase Configuration
+
+Create a `.env` file in the root folder and add the following:
+
 ```
 REACT_APP_API_KEY=your_api_key
 REACT_APP_AUTH_DOMAIN=your_auth_domain
@@ -109,41 +116,56 @@ REACT_APP_MESSAGING_SENDER_ID=your_messaging_sender_id
 REACT_APP_APP_ID=your_app_id
 ```
 
-### 5. Jalankan Aplikasi
+### 5. Run the Application
+
 ```bash
 npm start
 ```
-Akses di `http://localhost:3000`
+
+Open your browser at `http://localhost:3000`
 
 ---
 
-## 💻 Cara Penggunaan
+## 💻 Usage
 
 ### 🔐 Login
-Gunakan akun yang sudah didaftarkan di Firebase Auth.
 
-### 📊 Dasbor
-- Menampilkan lokasi pekerja secara real-time.
-- Klik nama karyawan untuk fokus ke lokasinya.
+Log in using an account registered in Firebase Authentication.
 
-### 🧭 Riwayat Lokasi
-- Pilih karyawan dan tanggal.
-- Playback pergerakan + grafik ringkasan (inside vs outside geofence).
+### 📊 Dashboard
 
-### 🛠️ Manajemen
-- **Karyawan**: Tambah/edit/hapus pekerja.
-- **Area Kerja**: Gambar area kerja di peta dan tetapkan ke karyawan.
+- Displays real-time location of workers.
+- Click an employee name to zoom to their location.
 
----
+### 🧭 Location History
 
-## ✨ Kontribusi
-Pull request sangat disambut! Untuk perubahan besar, harap buka issue terlebih dahulu.
+- Choose an employee and date.
+- Replay their movements and view inside/outside summary.
 
----
+### 🛠️ Management
 
-## 📝 Lisensi
-MIT License © 2025 Chandra Budi Wijaya
+- Add/edit/delete employees.
+- Draw and assign geofences to employees.
 
 ---
 
-> Dokumentasi ini disusun untuk mempermudah deployment dan pengembangan lanjutan oleh tim backend, frontend, dan admin operasional.
+## ✨ Contribution
+
+Pull requests are welcome! For major changes, please open an issue first.
+
+---
+
+## 📝 License
+
+**License:** Apache License 2.0 © 2025 Chandra Budi Wijaya
+
+This project is licensed under the [Apache License 2.0](./LICENSE).  
+You are free to use, modify, and distribute this code **as long as proper credit is given**:
+
+> Created by **Chandra Budi Wijaya**
+
+Removing the author’s name or violating the license terms may result in legal consequences.
+
+---
+
+> This documentation is intended to help future development and deployment by backend, frontend, and operational teams.
